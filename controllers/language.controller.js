@@ -2,6 +2,12 @@ const Language = require('../models/language.model');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 
+/***
+ * ---------------------------------------
+ * GET
+ * ---------------------------------------
+ */
+
 exports.getAllLanguages = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     try {

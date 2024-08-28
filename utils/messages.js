@@ -50,7 +50,13 @@ const messages = {
         INVALID_MSG_ID: "Invalid message Id",
         INVALID_REQUEST_ID: "Wrong request ID.",
         INTEREST_NOT_FOUND: "Not interest found.",
-        LANGUAGES_NOT_FOUND: "No language found."
+        LANGUAGES_NOT_FOUND: "No language found.",
+        PRIVATE_CONVERS_NOT_FOUND: "Private conversation not found.",
+        PRIVATE_MSG_NOT_FOUND: "Private message not found.",
+        USER_WITH_ID_NOT_FOUND: "No user with this id has been found.",
+        BAD_REQUEST: "Bad request.",
+        MESSAGE_DELETED_SUCCESS: "Message deleted with success!",
+        INVALID_CONVERS_ID: "Invalid conversation id."
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -98,7 +104,13 @@ const messages = {
         INVALID_MSG_ID: "Id du message invalide",
         INVALID_REQUEST_ID: "Id de requête incorrect.",
         INTEREST_NOT_FOUND: "Aucun centre d'intérêt trouvé.",
-        LANGUAGES_NOT_FOUND: "Aucune langue trouvée."
+        LANGUAGES_NOT_FOUND: "Aucune langue trouvée.",
+        PRIVATE_CONVERS_NOT_FOUND: "Conversation de groupe non trouvée.",
+        PRIVATE_MSG_NOT_FOUND: "Message non trouvé.",
+        USER_WITH_ID_NOT_FOUND: "Aucun utilisateur avec cet id trouvé.",
+        BAD_REQUEST: "Mauvaise requête.",
+        MESSAGE_DELETED_SUCCESS: "Message supprimé avec succès!",
+        INVALID_CONVERS_ID: "L'id de la conversation n'est pas valide."
     },
 };
 

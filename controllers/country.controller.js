@@ -3,8 +3,8 @@ const messages = require('../utils/messages')
 const getLanguageFromHeaders = require('../utils/languageUtils');
 
 exports.getAllCountries = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
     try {
-        const lang = getLanguageFromHeaders(req) || 'en';
         const countries = await Country.find();
         res.json(countries);
     } catch (err) {
@@ -14,9 +14,9 @@ exports.getAllCountries = async (req, res) => {
 
 exports.getCountriesByIds = async (req, res) => {
     const { ids } = req.query;
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const idsArray = ids.split(',');
     try {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        const idsArray = ids.split(',');
         const countries = await Country.find({ _id: { $in: idsArray } });
         res.json(countries);
     } catch (err) {

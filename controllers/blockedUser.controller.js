@@ -4,11 +4,15 @@ const BlockedUser = require('../models/blockedUser.model'),
 
 exports.getBlockedUserById = async (req, res) => {
     const { blockingUserId } = req.params
+    const lang = getLanguageFromHeaders(req) || 'en';
     try {
         const blockedUsers = await BlockedUser.find({ blockingUserId });
+        if(!blockedUsers){
+            return res.status(404).json({ message: messages[lang].USER_WITH_ID_NOT_FOUND });
+        }
         res.json(blockedUsers);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 
@@ -26,7 +30,7 @@ exports.createBlockedUser = async (req, res) => {
         const newBlockedUser = await blockedUser.save();
         res.status(201).json(newBlockedUser);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: messages[lang].BAD_REQUEST });
     }
 };
 
@@ -45,7 +49,7 @@ exports.deleteBlockedUser = async (req, res) => {
         }
         res.json({ message: messages[lang].SUCCESS_UNBLOCKED_USER });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 

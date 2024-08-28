@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const privateMessageSchema = new Schema({
+    conversationId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PrivateConversation',
+        required: true
+    },
     senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -13,14 +18,21 @@ const privateMessageSchema = new Schema({
         required: true
     },
     content: {
-        type: String
+        type: String,
+        required: true
     },
     timestamp: {
         type: Date,
+        default: Date.now,
+        required: true
+    },
+    isRead: {
+        type: Boolean,
+        default: false,
         required: true
     }
 }, {
-    timestamp: false
+    timestamps: true
 });
 
 const PrivateMessage = mongoose.model('PrivateMessage', privateMessageSchema, 'PrivateMessages');

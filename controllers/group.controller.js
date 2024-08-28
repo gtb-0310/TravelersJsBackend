@@ -7,8 +7,8 @@ const Group = require('../models/group.model'),
     messages = require('../utils/messages');
 
 exports.getGroupById = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
     try {
-        const lang = getLanguageFromHeaders(req) || 'en';
         const group = await Group.findById(req.params.id)
             .populate('members')
             .populate('administrators')
@@ -35,8 +35,9 @@ exports.getGroupsByUserId = async (req, res) => {
 };
 
 exports.createGroup = async (req, res) => {
+    const { trip, name, members, administrators, languages } = req.body;
+
     try {
-        const { trip, name, members, administrators, languages } = req.body;
 
         const newGroup = new Group({
             trip,
@@ -59,10 +60,10 @@ exports.createGroup = async (req, res) => {
  * ----------------------------------------------------- 
  **/
 exports.deleteGroupById = async (req, res) => {
-    try {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        const groupId = req.params.id;
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const groupId = req.params.id;
 
+    try {
         const group = await Group.findById(groupId);
 
         if (!group) {
