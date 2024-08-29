@@ -62,11 +62,15 @@ const groupMessageRoutes = require('./routes/groupMessage.routes');
 const interestRoutes = require('./routes/interest.routes');
 const languagesRoutes = require('./routes/language.routes');
 const privateMessagesRoutes = require('./routes/privateMessage.routes');
+const privateConversationsRoutes = require('./routes/privateConversation.routes');
+const reportedUsers = require('./routes/reportedUser.routes');
 
 // Utilisation de routes
+app.use('/private-conversations', privateConversationsRoutes);
 app.use('/private-messages', privateMessagesRoutes);
 app.use('/group-messages', groupMessageRoutes);
 app.use('/blocked-users', blockedUserRoutes);
+app.use('/reported-users', reportedUsers);
 app.use('/group-join', groupJoinRoutes);
 app.use('/languages', languagesRoutes);
 app.use('/interests', interestRoutes);

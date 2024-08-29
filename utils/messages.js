@@ -22,7 +22,6 @@ const messages = {
         SESSION_EXPIRED: "Session expired, please log in again.",
         CONNECTION_REQUIRED: "You need to be connected to use this functionality.",
         JOIN_REQUEST_NOT_FOUND: "No join request found for this group.",
-        SUCCESS: "Done!",
         ADMIN_NOT_FOUND: "No administrator found for this group.",
         ALREADY_MEMBER: "You are already member of this group.",
         REQUEST_SENT_SUCCESS: "Request send with success!",
@@ -56,7 +55,13 @@ const messages = {
         USER_WITH_ID_NOT_FOUND: "No user with this id has been found.",
         BAD_REQUEST: "Bad request.",
         MESSAGE_DELETED_SUCCESS: "Message deleted with success!",
-        INVALID_CONVERS_ID: "Invalid conversation id."
+        INVALID_CONVERS_ID: "Invalid conversation id.",
+        ALREADY_IN_CONVERS: "User already in conversation.",
+        USER_ADDED_TO_CONVERSATION_SUCCESS: "User successfully add to conversation!",
+        ERROR_REPORTING_RECUPERATION: "An error occured during the reporting recuperation.",
+        NO_REPORTS_FOUND: "No reporting found.",
+        INVALID_REPORT_ID: "Invalid reporting id.",
+        REASON_REQUIRED: "A reporting reason is required."
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -76,7 +81,6 @@ const messages = {
         SESSION_EXPIRED: "Session expirée, veuillez vous reconnecter.",
         CONNECTION_REQUIRED: "Veuillez vous connecter pour utiliser cette fonctionnalité.",
         JOIN_REQUEST_NOT_FOUND: "Aucune demande de participation trouvée pour ce groupe.",
-        SUCCESS: "L'action s'est bien executée!",
         ADMIN_NOT_FOUND: "Aucun administrateur trouvé pour ce groupe.",
         ALREADY_MEMBER: "Vous êtes déjà membre de ce groupe.",
         REQUEST_SENT_SUCCESS: "Requête envoyée avec succès!",
@@ -110,7 +114,13 @@ const messages = {
         USER_WITH_ID_NOT_FOUND: "Aucun utilisateur avec cet id trouvé.",
         BAD_REQUEST: "Mauvaise requête.",
         MESSAGE_DELETED_SUCCESS: "Message supprimé avec succès!",
-        INVALID_CONVERS_ID: "L'id de la conversation n'est pas valide."
+        INVALID_CONVERS_ID: "L'id de la conversation n'est pas valide.",
+        ALREADY_IN_CONVERS: "Utilisateur déjà dans la conversation.",
+        USER_ADDED_TO_CONVERSATION_SUCCESS: "Utilisateur ajouté à la conversation avec succès!",
+        ERROR_REPORTING_RECUPERATION: "Une erreur s'est produite durant la récupération des reportings.",
+        NO_REPORTS_FOUND: "Aucun reporting trouvé.",
+        INVALID_REPORT_ID: "Id de reporting invalide.",
+        REASON_REQUIRED: "Une raison pour un signalement est necessaire."
     },
 };
 
