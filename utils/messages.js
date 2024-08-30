@@ -61,7 +61,11 @@ const messages = {
         ERROR_REPORTING_RECUPERATION: "An error occured during the reporting recuperation.",
         NO_REPORTS_FOUND: "No reporting found.",
         INVALID_REPORT_ID: "Invalid reporting id.",
-        REASON_REQUIRED: "A reporting reason is required."
+        REASON_REQUIRED: "A reporting reason is required.",
+        NO_TRANSPORTS_FOUND: "Error occured during the transports recuperation.",
+        INVALID_TRANSPORT_ID: "Invalid transport Id.",
+        INVALID_TRIP_TYPE_ID: "Invalid trip type Id.",
+        NO_TRIPTYPE_FOUND: "No trip type found."
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -120,7 +124,11 @@ const messages = {
         ERROR_REPORTING_RECUPERATION: "Une erreur s'est produite durant la récupération des reportings.",
         NO_REPORTS_FOUND: "Aucun reporting trouvé.",
         INVALID_REPORT_ID: "Id de reporting invalide.",
-        REASON_REQUIRED: "Une raison pour un signalement est necessaire."
+        REASON_REQUIRED: "Une raison pour un signalement est necessaire.",
+        NO_TRANSPORTS_FOUND: "Une erreur est survenur pendant la récupération des transports.",
+        INVALID_TRANSPORT_ID: "Id du moyen de transport invalide.",
+        INVALID_TRIP_TYPE_ID: "Id du type de voyage invalide.",
+        NO_TRANSPORTS_FOUND: "Aucun type de voyage trouvé."
     },
 };
 

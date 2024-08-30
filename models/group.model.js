@@ -10,16 +10,19 @@ const groupSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         unique: true,
         ref: 'User',
+        required: true
     }],
     administrators: [{
         type: mongoose.Schema.Types.ObjectId,
         unique: true,
         ref: 'User',
+        required: true
     }],
     languages: [{
         type: mongoose.Schema.Types.ObjectId,
         unique: true,
         ref: 'Language',
+        required: true
     }],
     trip: {
         type: mongoose.Schema.Types.ObjectId,

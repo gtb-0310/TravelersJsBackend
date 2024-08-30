@@ -23,11 +23,11 @@ const tripSchema = new Schema({
         ref: 'User',
         required: true
     },
-    transport: {
+    transport: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transport',
         required: true
-    },
+    }],
     destination: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Country',

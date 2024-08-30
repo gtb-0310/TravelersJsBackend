@@ -63,15 +63,19 @@ const interestRoutes = require('./routes/interest.routes');
 const languagesRoutes = require('./routes/language.routes');
 const privateMessagesRoutes = require('./routes/privateMessage.routes');
 const privateConversationsRoutes = require('./routes/privateConversation.routes');
-const reportedUsers = require('./routes/reportedUser.routes');
+const reportedUsersRoutes = require('./routes/reportedUser.routes');
+const transportRoutes = require('./routes/transport.routes');
+const tripTypesRoutes = require('./routes/tripType.routes');
 
 // Utilisation de routes
 app.use('/private-conversations', privateConversationsRoutes);
 app.use('/private-messages', privateMessagesRoutes);
+app.use('/reported-users', reportedUsersRoutes);
 app.use('/group-messages', groupMessageRoutes);
 app.use('/blocked-users', blockedUserRoutes);
-app.use('/reported-users', reportedUsers);
+app.use('/transports', transportRoutes);
 app.use('/group-join', groupJoinRoutes);
+app.use('/tripTypes', tripTypesRoutes);
 app.use('/languages', languagesRoutes);
 app.use('/interests', interestRoutes);
 app.use('/countries', countryRoutes);
@@ -80,6 +84,7 @@ app.use('/auth', authRoutes);
 app.use(limiter);
 app.use(helmet());
 app.use(xssClean());
+
 
 // Lancer le serveur
 const PORT = process.env.PORT || 3000;
