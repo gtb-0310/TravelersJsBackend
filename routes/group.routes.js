@@ -141,66 +141,66 @@ router.get('/user/:userId', authenticateToken, groupController.getGroupsByUserId
  *       400:
  *         description: Erreur de validation
  */
-router.post(
-    '/',
-    authenticateToken,
-    (req, res, next) => {
-      const lang = getLanguageFromHeaders(req) || 'en';
-      req.validationMessages = messages[lang];
-      next();
-    },
-    [
-      check('trip')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_TRIP_ID),
-      check('name')
-        .isString().withMessage((value, { req }) => req.validationMessages.INVALID_NAME)
-        .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_NAME),
-      check('members')
-        .custom((members, { req }) => {
-          if (!Array.isArray(members) || members.length === 0) {
-            throw new Error(req.validationMessages.REQUIRED_MEMBERS);
-          }
-          members.forEach(memberId => {
-            if (!mongoose.Types.ObjectId.isValid(memberId)) {
-              throw new Error(req.validationMessages.INVALID_MEMBER_ID);
-            }
-          });
-          return true;
-        }),
-      check('administrators')
-        .custom((administrators, { req }) => {
-          if (!Array.isArray(administrators) || administrators.length === 0) {
-            throw new Error(req.validationMessages.REQUIRED_ADMINS);
-          }
-          administrators.forEach(adminId => {
-            if (!mongoose.Types.ObjectId.isValid(adminId)) {
-              throw new Error(req.validationMessages.INVALID_ADMIN_ID);
-            }
-          });
-          return true;
-        }),
-      check('languages')
-        .custom((languages, { req }) => {
-          if (!Array.isArray(languages) || languages.length === 0) {
-            throw new Error(req.validationMessages.REQUIRED_LANGUAGES);
-          }
-          languages.forEach(languageId => {
-            if (!mongoose.Types.ObjectId.isValid(languageId)) {
-              throw new Error(req.validationMessages.INVALID_LANGUAGE_ID);
-            }
-          });
-          return true;
-        }),
-    ],
-    (req, res, next) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-      next();
-    },
-    groupController.createGroup
-  );
+// router.post(
+//     '/',
+//     authenticateToken,
+//     (req, res, next) => {
+//       const lang = getLanguageFromHeaders(req) || 'en';
+//       req.validationMessages = messages[lang];
+//       next();
+//     },
+//     [
+//       check('trip')
+//         .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_TRIP_ID),
+//       check('name')
+//         .isString().withMessage((value, { req }) => req.validationMessages.INVALID_NAME)
+//         .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_NAME),
+//       check('members')
+//         .custom((members, { req }) => {
+//           if (!Array.isArray(members) || members.length === 0) {
+//             throw new Error(req.validationMessages.REQUIRED_MEMBERS);
+//           }
+//           members.forEach(memberId => {
+//             if (!mongoose.Types.ObjectId.isValid(memberId)) {
+//               throw new Error(req.validationMessages.INVALID_MEMBER_ID);
+//             }
+//           });
+//           return true;
+//         }),
+//       check('administrators')
+//         .custom((administrators, { req }) => {
+//           if (!Array.isArray(administrators) || administrators.length === 0) {
+//             throw new Error(req.validationMessages.REQUIRED_ADMINS);
+//           }
+//           administrators.forEach(adminId => {
+//             if (!mongoose.Types.ObjectId.isValid(adminId)) {
+//               throw new Error(req.validationMessages.INVALID_ADMIN_ID);
+//             }
+//           });
+//           return true;
+//         }),
+//       check('languages')
+//         .custom((languages, { req }) => {
+//           if (!Array.isArray(languages) || languages.length === 0) {
+//             throw new Error(req.validationMessages.REQUIRED_LANGUAGES);
+//           }
+//           languages.forEach(languageId => {
+//             if (!mongoose.Types.ObjectId.isValid(languageId)) {
+//               throw new Error(req.validationMessages.INVALID_LANGUAGE_ID);
+//             }
+//           });
+//           return true;
+//         }),
+//     ],
+//     (req, res, next) => {
+//       const errors = validationResult(req);
+//       if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//       }
+//       next();
+//     },
+//     groupController.createGroup
+//   );
 
 
 /**
@@ -288,6 +288,78 @@ router.delete(
     checkAdminOrRequestOwner,
     groupController.removeUserFromGroup
   );
+
+
+
+/**
+ * @swagger
+ * /groups/{groupId}/addAdmin/{userId}:
+ *   post:
+ *     summary: Ajoute un utilisateur en tant qu'administrateur d'un groupe (ADMINISTRATEUR)
+ *     tags: [Groups]
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         required: true
+ *         description: ID du groupe
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: ID de l'utilisateur à ajouter comme administrateur
+ *         schema:
+ *           type: string
+ *     security:
+ *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
+ *     responses:
+ *       200:
+ *         description: Utilisateur ajouté en tant qu'administrateur du groupe avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: L'utilisateur a été ajouté avec succès en tant qu'administrateur.
+ *                 group:
+ *                   type: object
+ *                   description: Le groupe mis à jour après l'ajout de l'administrateur
+ *       400:
+ *         description: L'utilisateur est déjà administrateur du groupe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: L'utilisateur est déjà administrateur du groupe.
+ *       404:
+ *         description: Groupe non trouvé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Groupe non trouvé.
+ *       500:
+ *         description: Erreur interne du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Une erreur est survenue.
+ */
+
+router.post('/:groupId/addAdmin/:userId', authenticateToken, groupController.addAdminToGroup);
+
 
 
 module.exports = router;
