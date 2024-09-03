@@ -88,7 +88,6 @@ router.get(
     }
     next();
   },
-  checkAdminOrRequestOwner,
   groupController.getJoinRequestsByGroupId
 );
 
@@ -290,7 +289,6 @@ router.post(
     }
     next();
   },
-  checkAdminOrRequestOwner,
   groupController.approveGroupJoinRequest
 );
 
@@ -339,7 +337,6 @@ router.delete(
     }
     next();
   },
-  checkAdminOrRequestOwner,
   groupController.deleteJoinRequestById
 );
 

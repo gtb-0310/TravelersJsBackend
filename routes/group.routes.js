@@ -3,7 +3,6 @@ const express = require('express');
     groupController = require('../controllers/group.controller'),
     { check, validationResult } = require('express-validator'),
     authenticateToken = require('../middlewares/authenticateToken'),
-    checkAdminOrRequestOwner = require('../middlewares/checkAdminOrRequestOwner'),
     getLanguageFromHeaders = require('../utils/languageUtils'),
     messages = require('../utils/messages'),
     mongoose = require('mongoose');
@@ -96,11 +95,9 @@ router.get('/user/:userId', authenticateToken, groupController.getGroupsByUserId
  *                   type: string
  *                 description: Liste des IDs des membres du groupe (doit être un ObjectId)
  *                 required: true
- *               administrators:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: Liste des IDs des administrateurs du groupe (doit être un ObjectId)
+ *               administrator:
+ *                 type: string
+ *                 description: Id de l'administrateur du groupe
  *                 required: true
  *               languages:
  *                 type: array
@@ -128,10 +125,9 @@ router.get('/user/:userId', authenticateToken, groupController.getGroupsByUserId
  *                   type: array
  *                   items:
  *                     type: string
- *                 administrators:
- *                   type: array
- *                   items:
- *                     type: string
+ *               administrator:
+ *                 type: string
+ *                 description: Id de l'administrateur du groupe
  *                 languages:
  *                   type: array
  *                   items:
@@ -237,7 +233,6 @@ router.delete(
       }
       next();
     },
-    checkAdminOrRequestOwner,
     groupController.deleteGroupById
   );
 
@@ -285,81 +280,8 @@ router.delete(
       }
       next();
     },
-    checkAdminOrRequestOwner,
     groupController.removeUserFromGroup
   );
-
-
-
-/**
- * @swagger
- * /groups/{groupId}/addAdmin/{userId}:
- *   post:
- *     summary: Ajoute un utilisateur en tant qu'administrateur d'un groupe (ADMINISTRATEUR)
- *     tags: [Groups]
- *     parameters:
- *       - in: path
- *         name: groupId
- *         required: true
- *         description: ID du groupe
- *         schema:
- *           type: string
- *       - in: path
- *         name: userId
- *         required: true
- *         description: ID de l'utilisateur à ajouter comme administrateur
- *         schema:
- *           type: string
- *     security:
- *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
- *     responses:
- *       200:
- *         description: Utilisateur ajouté en tant qu'administrateur du groupe avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: L'utilisateur a été ajouté avec succès en tant qu'administrateur.
- *                 group:
- *                   type: object
- *                   description: Le groupe mis à jour après l'ajout de l'administrateur
- *       400:
- *         description: L'utilisateur est déjà administrateur du groupe
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: L'utilisateur est déjà administrateur du groupe.
- *       404:
- *         description: Groupe non trouvé
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Groupe non trouvé.
- *       500:
- *         description: Erreur interne du serveur
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Une erreur est survenue.
- */
-
-router.post('/:groupId/addAdmin/:userId', authenticateToken, groupController.addAdminToGroup);
-
 
 
 module.exports = router;

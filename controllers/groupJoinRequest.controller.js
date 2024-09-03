@@ -28,7 +28,6 @@ exports.getJoinRequestsByGroupId = async (req, res) => {
 
 
 exports.getJoinRequestsByUserId = async (req, res) => {
-
     const lang = getLanguageFromHeaders(req) || 'en';
     const { userId } = req.params;
 
@@ -71,7 +70,6 @@ exports.askGroupJoinRequest = async (req, res) => {
 
 
 exports.approveGroupJoinRequest = async (req, res) => {
-
     const lang = getLanguageFromHeaders(req) || 'en';
     const { requestId } = req.params;
 

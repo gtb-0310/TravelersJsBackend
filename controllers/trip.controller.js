@@ -142,7 +142,7 @@ exports.createTrip = async (req, res) => {
         const group = new Group({
             name: title, 
             members: [userId], 
-            administrators: [userId],
+            administrator: userId,
             languages: user.languages,
             trip: null
         });

@@ -49,7 +49,27 @@ const userSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Interest',
         required: true
-    }]
+    }],
+    resetPasswordToken: {
+        type: String,
+        required: false
+    },
+    resetPasswordExpires: {
+        type: Date,
+        required: false
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailVerificationToken: {
+        type: String,
+        required: false
+    },
+    emailVerificationExpires: {
+        type: Date,
+        required: false
+    }
 }, {
     timestamps: true
 });

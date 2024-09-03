@@ -12,12 +12,11 @@ const groupSchema = new Schema({
         ref: 'User',
         required: true
     }],
-    administrators: [{
+    administrator: {
         type: mongoose.Schema.Types.ObjectId,
-        unique: true,
-        ref: 'User',
-        required: true
-    }],
+        required: true,
+        ref: 'User'
+    },
     languages: [{
         type: mongoose.Schema.Types.ObjectId,
         unique: true,

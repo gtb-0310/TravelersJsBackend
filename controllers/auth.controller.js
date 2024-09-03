@@ -6,19 +6,24 @@ const User = require('../models/user.model'),
 
 exports.login = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const user = await User.findOne({ email: req.body.email});
-    if (!user) {
-        return res.status(400).json({ message: messages[lang].USER_NOT_FOUND});
-    }
-    try{
+
+    try {
+        const user = await User.findOne({ email: req.body.email});
+
+        if (!user) {
+            return res.status(400).json({ message: messages[lang].USER_NOT_FOUND});
+        }
+
+        if (!user.emailVerified) {
+            return res.status(403).json({ message: messages[lang].EMAIL_NOT_VERIFIED });
+        }
+
         if (await bcrypt.compare(req.body.password, user.password)) {
             const accessToken = jwt.sign({ id: user._id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'});
             const refreshToken = jwt.sign({ id: user._id}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '30d'});
 
             await User.findByIdAndUpdate(user._id, { refreshToken }, { new: true, runValidators: false });
 
-            // user.refreshToken = refreshToken;
-            // await user.save();
 
             res.json({ accessToken, refreshToken});
         } else {
@@ -49,4 +54,27 @@ exports.refreshToken = async (req, res) => {
         const accessToken = jwt.sign({ id: decoded.id}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
         res.json({ accessToken });
     })
-}
+};
+
+exports.logout = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const refreshToken = req.body.token;
+
+    if (!refreshToken) {
+        return res.status(400).json({ message: messages[lang].SESSION_EXPIRED });
+    }
+
+    try {
+        const user = await User.findOne({ refreshToken });
+
+        if (!user) {
+            return res.status(400).json({ message: messages[lang].USER_NOT_FOUND });
+        }
+
+        await User.findByIdAndUpdate(user._id, { refreshToken: '' }, { new: true, runValidators: false });
+
+        res.status(200).json({ message: messages[lang].LOGOUT_SUCCESS });
+    } catch (err) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+};

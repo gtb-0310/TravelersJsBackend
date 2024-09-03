@@ -67,6 +67,7 @@ const reportedUsersRoutes = require('./routes/reportedUser.routes');
 const transportRoutes = require('./routes/transport.routes');
 const tripTypesRoutes = require('./routes/tripType.routes');
 const tripRoutes = require('./routes/trip.routes');
+const usersRoutes = require('./routes/user.routes');
 
 // Utilisation de routes
 app.use('/private-conversations', privateConversationsRoutes);
@@ -81,6 +82,7 @@ app.use('/languages', languagesRoutes);
 app.use('/interests', interestRoutes);
 app.use('/countries', countryRoutes);
 app.use('/groups', groupRoutes);
+app.use('/users', usersRoutes);
 app.use('/trips', tripRoutes);
 app.use('/auth', authRoutes);
 app.use(limiter);

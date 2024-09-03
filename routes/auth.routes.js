@@ -118,7 +118,7 @@ router.post(
     [
       (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang]; // Ajouter les messages à la requête pour un accès facile
+        req.validationMessages = messages[lang];
         next();
       },
       check('token')
@@ -136,7 +136,53 @@ router.post(
   );
   
 
-// Si tu décides d'ajouter la déconnexion côté serveur plus tard, tu pourras décommenter la ligne suivante
-// router.post('/logout', authController.logout);
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Déconnecte l'utilisateur en révoquant le refreshToken
+ *     tags: [Authentification]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: Le refreshToken à révoquer
+ *     responses:
+ *       200:
+ *         description: Déconnexion réussie
+ *       400:
+ *         description: Token manquant ou utilisateur non trouvé
+ *       500:
+ *         description: Erreur du serveur
+ */
+router.post(
+  '/logout',
+  [
+    (req, res, next) => {
+      const lang = getLanguageFromHeaders(req) || 'en';
+      req.validationMessages = messages[lang];
+      next();
+    },
+    check('token')
+      .notEmpty().withMessage((value, { req }) => req.validationMessages.MISSING_TOKEN)
+      .trim().escape(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  authController.logout
+);
+
 
 module.exports = router;
