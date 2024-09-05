@@ -35,15 +35,17 @@ exports.createBlockedUser = async (req, res) => {
 };
 
 exports.deleteBlockedUser = async (req, res) => {
-    const { blockingUserId, blockedUserId } = req.params;
+    const blockedUserDocId = req.params.blockedUserDocId;
     const lang = getLanguageFromHeaders(req) || 'en';
 
-    if (!blockingUserId || !blockedUserId) {
+    console.log(blockedUserDocId);
+
+    if (!blockedUserDocId) {
         return res.status(400).json({ message: messages[lang].MISSING_FIELDS });
     }
 
     try {
-        const unblockedUser = await BlockedUser.findOneAndDelete({ blockingUserId, blockedUserId });
+        const unblockedUser = await BlockedUser.findOneAndDelete(blockedUserDocId);
         if (!unblockedUser) {
             return res.status(404).json({ message: messages[lang].ERROR_OCCURED });
         }

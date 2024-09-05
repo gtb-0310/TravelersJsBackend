@@ -57,7 +57,7 @@ router.post(
     [
       (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang]; // Ajouter les messages à la requête pour un accès facile
+        req.validationMessages = messages[lang];
         next();
       },
       check('email')
@@ -132,8 +132,8 @@ router.post(
       }
       next();
     },
-    authController.refreshToken
-  );
+  authController.refreshToken
+);
   
 
 /**

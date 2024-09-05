@@ -110,21 +110,15 @@ router.post(
 
 /**
  * @swagger
- * /blocked-users/{blockingUserId}/{blockedUserId}:
+ * /blocked-users/{blockedUserDocId}:
  *   delete:
  *     summary: Débloque un utilisateur
  *     tags: [Blocked users]
  *     parameters:
  *       - in: path
- *         name: blockingUserId
+ *         name: blockedUserDocId
  *         required: true
- *         description: ID de l'utilisateur qui a bloqué
- *         schema:
- *           type: string
- *       - in: path
- *         name: blockedUserId
- *         required: true
- *         description: ID de l'utilisateur bloqué
+ *         description: ID du document
  *         schema:
  *           type: string
  *     responses:
@@ -136,18 +130,15 @@ router.post(
  *         description: Erreur lors du déblocage de l'utilisateur
  */
 router.delete(
-    '/:blockingUserId/:blockedUserId',
-    authenticateToken,
+    '/:blockedUserDocId',
     [
       (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
         next();
       },
-      check('blockingUserId')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKING_USER_ID),
-      check('blockedUserId')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKED_USER_ID),
+      check('blockedUserDocId')
+        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKED_DOC_ID),
     ],
     (req, res, next) => {
       const errors = validationResult(req);
