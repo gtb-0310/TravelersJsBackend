@@ -1,7 +1,10 @@
-const express = require('express'),
-    router = express.Router(),
-    countryController = require('../controllers/country.controller'),
-    authenticateToken = require('../middlewares/authenticateToken');
+const express = require('express');
+const { check, validationResult } = require('express-validator');
+const router = express.Router();
+const countryController = require('../controllers/country.controller');
+const authenticateToken = require('../middlewares/authenticateToken');
+const getLanguageFromHeaders = require('../utils/languageUtils');
+const messages = require('../utils/messages');
 
 /**
  * @swagger
@@ -68,6 +71,35 @@ router.get('/', authenticateToken, countryController.getAllCountries);
  *                     type: string
  *                     description: Nom du pays
  */
-router.get('/by-ids', authenticateToken, countryController.getCountriesByIds);
+router.get('/by-ids',
+    authenticateToken,
+    (req, res, next) => {
+        const lang = getLanguageFromHeaders(req) || 'en';
+        req.validationMessages = messages[lang];
+        next();
+    },
+    check('ids')
+        .custom((value, { req }) => {
+            const idsArray = value.split(',');
+            if (idsArray.length === 0) {
+                throw new Error(req.validationMessages.SELECT_A_COUNTRY);
+            }
+
+            idsArray.forEach(id => {
+                if (!mongoose.Types.ObjectId.isValid(id)) {
+                    throw new Error(req.validationMessages.INVALID_COUNTRY_ID);
+                }
+            });
+            return true;
+        }),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    },
+    countryController.getCountriesByIds
+);
 
 module.exports = router;

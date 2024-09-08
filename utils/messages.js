@@ -109,10 +109,9 @@ const messages = {
         REQUIRED_RESET_TOKEN: "The rester token to reset the password is required.",
         INVALID_RESET_TOKEN: "The token is invalid, please ask again to reset the password",
         REQUIRED_VERIFICATION_TOKEN: "The verification token is required.",
-        INVALID_VERIFICATION_TOKEN: "the verification token is invalid. Ask again to a mail check up."
-
-
-
+        INVALID_VERIFICATION_TOKEN: "the verification token is invalid. Ask again to a mail check up.",
+        INVALID_COUNTRY_ID: "One or multiple country id is invalid.",
+        SELECT_A_COUNTRY: "You need to select at least one county."
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -219,7 +218,9 @@ const messages = {
         REQUIRED_RESET_TOKEN: "Un token est requis, faites une demande de réinitialisation de mot de passe.",
         INVALID_RESET_TOKEN: "Le token est invalide, réessayer de réinitialiser votre mot de passe.",
         REQUIRED_VERIFICATION_TOKEN: "Le token de verification est requis.",
-        INVALID_VERIFICATION_TOKEN: "Le token de vérification est invalide. Refaites une demande de verification de mail."
+        INVALID_VERIFICATION_TOKEN: "Le token de vérification est invalide. Refaites une demande de verification de mail.",
+        INVALID_COUNTRY_ID: "Un ou plusieurs id de pays est invalide.",
+        SELECT_A_COUNTRY: "Vous devez selectionner au moins un pays."
     },
 };
 
