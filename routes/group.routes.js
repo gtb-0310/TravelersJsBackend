@@ -1,11 +1,12 @@
 const express = require('express');
-    router = express.Router(),
-    groupController = require('../controllers/group.controller'),
-    { check, validationResult } = require('express-validator'),
-    authenticateToken = require('../middlewares/authenticateToken'),
-    getLanguageFromHeaders = require('../utils/languageUtils'),
-    messages = require('../utils/messages'),
-    mongoose = require('mongoose');
+const { check, validationResult } = require('express-validator');
+const router = express.Router();
+const mongoose = require('mongoose');
+const groupController = require('../controllers/group.controller');
+const authenticateToken = require('../middlewares/authenticateToken');
+const getLanguageFromHeaders = require('../utils/languageUtils');
+const checkAdminPrivileges = require('../middlewares/checkAdminPrivileges');
+const messages = require('../utils/messages');
 
 
 /**
@@ -40,7 +41,27 @@ const express = require('express');
  *                 name:
  *                   type: string
  */
-router.get('/:id', authenticateToken, groupController.getGroupById);
+router.get(
+  '/:groupId',
+  authenticateToken,
+  (req, res, next) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    req.validationMessages = messages[lang];
+    next();
+  },
+  [
+    check('groupId')
+        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID)
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  groupController.getGroupById
+);
 
 /**
  * @swagger
@@ -70,7 +91,27 @@ router.get('/:id', authenticateToken, groupController.getGroupById);
  *                   name:
  *                     type: string
  */
-router.get('/user/:userId', authenticateToken, groupController.getGroupsByUserId);
+router.get(
+  '/user/:userId',
+  authenticateToken,
+  (req, res, next) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    req.validationMessages = messages[lang];
+    next();
+  },
+  [
+    check('userId')
+      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID)
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  groupController.getGroupsByUserId
+);
 
 /**
  * @swagger
@@ -233,6 +274,7 @@ router.delete(
       }
       next();
     },
+    checkAdminPrivileges,
     groupController.deleteGroupById
   );
 

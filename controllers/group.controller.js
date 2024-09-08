@@ -15,8 +15,9 @@ const Group = require('../models/group.model'),
 
 exports.getGroupById = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
+    const groupId = req.params.groupId;
     try {
-        const group = await Group.findById(req.params.id)
+        const group = await Group.findById(groupId)
             .populate('members')
             .populate('administrator')
             .populate('languages');
