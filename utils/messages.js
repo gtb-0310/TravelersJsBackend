@@ -112,7 +112,8 @@ const messages = {
         INVALID_VERIFICATION_TOKEN: "the verification token is invalid. Ask again to a mail check up.",
         INVALID_COUNTRY_ID: "One or multiple country id is invalid.",
         SELECT_A_COUNTRY: "You need to select at least one county.",
-        NOT_ADMIN_DENIED_ACCESS: "You need to be administrator to use this function."
+        NOT_ADMIN_DENIED_ACCESS: "You need to be administrator to use this function.",
+        ORIGIN_NOT_ALLOWED: "Origin request not allowed."
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -222,7 +223,8 @@ const messages = {
         INVALID_VERIFICATION_TOKEN: "Le token de vérification est invalide. Refaites une demande de verification de mail.",
         INVALID_COUNTRY_ID: "Un ou plusieurs id de pays est invalide.",
         SELECT_A_COUNTRY: "Vous devez selectionner au moins un pays.",
-        NOT_ADMIN_DENIED_ACCESS: "Cette action requiert les droits administrateur."
+        NOT_ADMIN_DENIED_ACCESS: "Cette action requiert les droits administrateur.",
+        ORIGIN_NOT_ALLOWED: "L'origine de la requête n'est pas autorisée."
     },
 };
 

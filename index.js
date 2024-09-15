@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express'),
+    customCorsMiddleware = require('./middlewares/corsMiddleware'),
     connectToDB = require('./config/db'),
     swaggerUi = require('swagger-ui-express'),
     swaggerJsdoc = require('swagger-jsdoc'),
@@ -50,6 +51,7 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs)); 
 
 // Middlewares
+app.use(customCorsMiddleware);
 app.use(express.json());
 
 // Importation des fichiers de routes
