@@ -10,13 +10,9 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    age: {
-        type: Number,
-        required: true,
-        validate: {
-            validator: Number.isInteger,
-            message: '{VALUE} is not an integer'
-        }
+    birthDate: {
+        type: Date,
+        required: true
     },
     email: {
         type: String,

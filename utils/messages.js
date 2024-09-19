@@ -113,7 +113,9 @@ const messages = {
         INVALID_COUNTRY_ID: "One or multiple country id is invalid.",
         SELECT_A_COUNTRY: "You need to select at least one county.",
         NOT_ADMIN_DENIED_ACCESS: "You need to be administrator to use this function.",
-        ORIGIN_NOT_ALLOWED: "Origin request not allowed."
+        ORIGIN_NOT_ALLOWED: "Origin request not allowed.",
+        PASSWORDS_DO_NOT_MATCH: "Passwords do not match.",
+        UNDERAGE_NOT_ALLOWED: "You must have at least 16 years to use Travelers."
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -224,7 +226,9 @@ const messages = {
         INVALID_COUNTRY_ID: "Un ou plusieurs id de pays est invalide.",
         SELECT_A_COUNTRY: "Vous devez selectionner au moins un pays.",
         NOT_ADMIN_DENIED_ACCESS: "Cette action requiert les droits administrateur.",
-        ORIGIN_NOT_ALLOWED: "L'origine de la requête n'est pas autorisée."
+        ORIGIN_NOT_ALLOWED: "L'origine de la requête n'est pas autorisée.",
+        PASSWORDS_DO_NOT_MATCH: "Les mots de passe ne correspondent pas.",
+        UNDERAGE_NOT_ALLOWED: "Vous devez avoir au minimum 16 ans pour vous inscrire sur Travelers."
     },
 };
 

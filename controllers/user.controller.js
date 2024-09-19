@@ -8,6 +8,7 @@ const PrivateConversation = require('../models/privateConversation.model');
 const ReportedUser = require('../models/reportedUser.model');
 const Trip = require('../models/trip.model');
 const messages = require('../utils/messages');
+const { calculateAge } = require('../utils/ageUtils');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -20,7 +21,7 @@ const nodemailer = require('nodemailer');
  */
 exports.getUserById = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const userId = req.param.id;
+    const userId = req.params.id;
 
     try {
         const user = await User.findById(userId);
@@ -29,7 +30,9 @@ exports.getUserById = async (req, res) => {
             return res.status(404).json({ message: messages[lang].USER_ID_NOT_FOUND });
         }
 
-        res.json(user);
+        const age = calculateAge(user.birthDate);
+
+        res.json({ ...user._doc, age });
 
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
@@ -43,12 +46,22 @@ exports.getUserById = async (req, res) => {
  */
 exports.createUser = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { email, password } = req.body;
+    const { email, password, confirmPassword, birthDate } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: messages[lang].EMAIL_ALREADY_IN_USE });
+        }
+
+        if(password !== confirmPassword){
+            return res.status(400).json({ message: messages[lang].PASSWORDS_DO_NOT_MATCH });
+        }
+
+        const age = calculateAge(birthDate);
+
+        if (age < 16) {
+            return res.status(400).json({ message: messages[lang].UNDERAGE_NOT_ALLOWED });
         }
 
 
@@ -65,9 +78,9 @@ exports.createUser = async (req, res) => {
             password: hashedPassword,
             firstName: '',
             lastName: '',
-            age: 0,
             languages: [],
             interests: [],
+            birthDate: new Date(birthDate),
             profilePictureUrl: '',
             description: '',
             refreshToken: '',
@@ -76,29 +89,31 @@ exports.createUser = async (req, res) => {
             emailVerificationExpires: Date.now() + 3600000 
         });
 
-        const savedUser = await newUser.save();
+        console.log(newUser);
 
-        const verificationUrl = `http://localhost:3000/verifyEmail/${verificationToken}`;
+        // const savedUser = await newUser.save();
 
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'your-email@gmail.com',
-                pass: 'your-email-password'
-            }
-        });
+        // const verificationUrl = `http://localhost:3000/verifyEmail/${verificationToken}`;
 
-        const mailOptions = {
-            from: 'your-email@gmail.com',
-            to: email,
-            subject: messages[lang].VERIFY_EMAIL_SUBJECT,
-            text: `${messages[lang].VERIFY_EMAIL_TEXT} ${verificationUrl}`,
-            html: `<p>${messages[lang].VERIFY_EMAIL_HTML}</p><p><a href="${verificationUrl}">${verificationUrl}</a></p>`
-        };
+        // const transporter = nodemailer.createTransport({
+        //     service: 'gmail',
+        //     auth: {
+        //         user: 'your-email@gmail.com',
+        //         pass: 'your-email-password'
+        //     }
+        // });
 
-        await transporter.sendMail(mailOptions);
+        // const mailOptions = {
+        //     from: 'your-email@gmail.com',
+        //     to: email,
+        //     subject: messages[lang].VERIFY_EMAIL_SUBJECT,
+        //     text: `${messages[lang].VERIFY_EMAIL_TEXT} ${verificationUrl}`,
+        //     html: `<p>${messages[lang].VERIFY_EMAIL_HTML}</p><p><a href="${verificationUrl}">${verificationUrl}</a></p>`
+        // };
 
-        res.status(201).json({ message: messages[lang].EMAIL_VERIFICATION_SENT, user: savedUser });
+        // await transporter.sendMail(mailOptions);
+
+        // res.status(201).json({ message: messages[lang].EMAIL_VERIFICATION_SENT, user: savedUser });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });

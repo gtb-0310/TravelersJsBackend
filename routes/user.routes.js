@@ -90,16 +90,13 @@ router.get(
  *               password:
  *                 type: string
  *                 description: Le mot de passe de l'utilisateur
- *               firstName:
+ *               confirmPassword:
  *                 type: string
- *               lastName:
+ *                 description: Confirmation de mot de passe
+ *               birthDate:
  *                 type: string
- *               age:
- *                 type: integer
- *               profilePictureUrl:
- *                 type: string
- *               description:
- *                 type: string
+ *                 format: date
+ *                 description: Date de naissance de l'utilisateur
  *     responses:
  *       201:
  *         description: Utilisateur créé avec succès
@@ -110,7 +107,6 @@ router.get(
  */
 router.post(
     '/',
-    authenticateToken,
     [
       (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
