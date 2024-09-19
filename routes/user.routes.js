@@ -5,6 +5,7 @@ const userController = require('../controllers/user.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
+const checkOwnerProfil = require('../middlewares/checkOwnerProfil');
 
 /**
  * @swagger
@@ -494,6 +495,7 @@ router.post(
 router.delete(
     '/:id',
     authenticateToken,
+    checkOwnerProfil,
     [
         (req, res, next) => {
             const lang = getLanguageFromHeaders(req) || 'en';
