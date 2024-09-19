@@ -1,3 +1,4 @@
+require('dotenv').config();
 const User = require('../models/user.model');
 const BlockedUser = require('../models/blockedUser.model');
 const GroupJoinRequest = require('../models/groupJoinRequest.model');
@@ -82,38 +83,43 @@ exports.createUser = async (req, res) => {
             interests: [],
             birthDate: new Date(birthDate),
             profilePictureUrl: '',
-            description: '',
+            description: 'Add a description',
             refreshToken: '',
             emailVerified: false,
             emailVerificationToken: hashedToken,
             emailVerificationExpires: Date.now() + 3600000 
         });
 
-        console.log(newUser);
+        const savedUser = await newUser.save();
 
-        // const savedUser = await newUser.save();
+        console.log(savedUser);
 
-        // const verificationUrl = `http://localhost:3000/verifyEmail/${verificationToken}`;
+        const verificationUrl = `http://localhost:3000/auth/verify-email/${verificationToken}`;
 
-        // const transporter = nodemailer.createTransport({
-        //     service: 'gmail',
-        //     auth: {
-        //         user: 'your-email@gmail.com',
-        //         pass: 'your-email-password'
-        //     }
-        // });
 
-        // const mailOptions = {
-        //     from: 'your-email@gmail.com',
-        //     to: email,
-        //     subject: messages[lang].VERIFY_EMAIL_SUBJECT,
-        //     text: `${messages[lang].VERIFY_EMAIL_TEXT} ${verificationUrl}`,
-        //     html: `<p>${messages[lang].VERIFY_EMAIL_HTML}</p><p><a href="${verificationUrl}">${verificationUrl}</a></p>`
-        // };
+        const transporter = nodemailer.createTransport({
+            host: 'sandbox.smtp.mailtrap.io',
+            port: 2525,
+            auth: {
+                user: process.env.MAILTRAP_USER,
+                pass: process.env.MAILTRAP_PASS
+            }
+        });
 
-        // await transporter.sendMail(mailOptions);
+        const mailOptions = {
+            from: 'noreply@travelers.com',
+            to: email,
+            subject: messages[lang].VERIFY_EMAIL_SUBJECT,
+            html: `
+                <p>${messages[lang].VERIFY_EMAIL_BODY}</p>
+                <p><a href="${verificationUrl}">${verificationUrl}</a></p>
+                <p>${messages[lang].IGNORE_IF_NOT_YOU}</p>
+            `
+        };
 
-        // res.status(201).json({ message: messages[lang].EMAIL_VERIFICATION_SENT, user: savedUser });
+        await transporter.sendMail(mailOptions);
+
+        res.status(201).json({ message: messages[lang].EMAIL_VERIFICATION_SENT, user: savedUser });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
@@ -269,35 +275,6 @@ exports.resetPassword = async (req, res) => {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
-
-exports.verifyEmail = async (req, res) => {
-    const { token } = req.params;
-    const lang = getLanguageFromHeaders(req) || 'en';
-
-    try {
-        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-        const user = await User.findOne({
-            emailVerificationToken: hashedToken,
-            emailVerificationExpires: { $gt: Date.now() }
-        });
-
-        if (!user) {
-            return res.status(400).json({ message: messages[lang].INVALID_OR_EXPIRED_TOKEN });
-        }
-
-        user.emailVerified = true;
-        user.emailVerificationToken = undefined;
-        user.emailVerificationExpires = undefined;
-
-        await user.save();
-
-        res.status(200).json({ message: messages[lang].EMAIL_VERIFIED_SUCCESS });
-    } catch (err) {
-        res.status(500).json({ message: messages[lang].SERVER_ERROR });
-    }
-};
-
 
 
 /***

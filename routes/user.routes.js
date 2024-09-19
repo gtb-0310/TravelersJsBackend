@@ -459,57 +459,6 @@ router.post(
     userController.resetPassword
 );
 
-/**
- * @swagger
- * /auth/verify-email/{token}:
- *   get:
- *     summary: Vérifie l'email de l'utilisateur
- *     tags: [Authentification]
- *     parameters:
- *       - in: path
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Le token de vérification d'email reçu par l'utilisateur
- *     responses:
- *       200:
- *         description: Email vérifié avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Email vérifié avec succès."
- *       400:
- *         description: Token invalide ou expiré
- *       500:
- *         description: Erreur du serveur
- */
-router.get(
-    '/verify-email/:token',
-    [
-        (req, res, next) => {
-            const lang = getLanguageFromHeaders(req) || 'en';
-            req.validationMessages = messages[lang];
-            next();
-        },
-        check('token')
-            .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_VERIFICATION_TOKEN)
-            .isString().withMessage((value, { req }) => req.validationMessages.INVALID_VERIFICATION_TOKEN)
-            .trim().escape(),
-    ],
-    (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        next();
-    },
-    userController.verifyEmail
-);
 
 /**
  * @swagger

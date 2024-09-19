@@ -2,7 +2,8 @@ const User = require('../models/user.model'),
     bcrypt = require('bcrypt'),
     jwt = require('jsonwebtoken'),
     getLanguageFromHeaders = require('../utils/languageUtils'),
-    messages = require('../utils/messages');
+    messages = require('../utils/messages'),
+    crypto = require('crypto');
 
 exports.login = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
@@ -54,6 +55,36 @@ exports.refreshToken = async (req, res) => {
         const accessToken = jwt.sign({ id: decoded.id}, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
         res.json({ accessToken });
     })
+};
+
+exports.verifyEmail = async (req, res) => {
+    const { token } = req.params;
+    const lang = getLanguageFromHeaders(req) || 'en';
+
+    try {
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+
+        const user = await User.findOne({
+            emailVerificationToken: hashedToken,
+            emailVerificationExpires: { $gt: Date.now() } 
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: messages[lang].INVALID_OR_EXPIRED_TOKEN });
+        }
+
+
+        user.emailVerified = true;
+        user.emailVerificationToken = undefined;
+        user.emailVerificationExpires = undefined;
+
+        await user.save();
+
+        res.status(200).json({ message: messages[lang].EMAIL_VERIFIED_SUCCESS });
+    } catch (err) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
 };
 
 exports.logout = async (req, res) => {

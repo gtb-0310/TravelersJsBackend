@@ -115,7 +115,12 @@ const messages = {
         NOT_ADMIN_DENIED_ACCESS: "You need to be administrator to use this function.",
         ORIGIN_NOT_ALLOWED: "Origin request not allowed.",
         PASSWORDS_DO_NOT_MATCH: "Passwords do not match.",
-        UNDERAGE_NOT_ALLOWED: "You must have at least 16 years to use Travelers."
+        UNDERAGE_NOT_ALLOWED: "You must have at least 16 years to use Travelers.",
+        VERIFY_EMAIL_SUBJECT: "Email address verification",
+        VERIFY_EMAIL_BODY: 'Thank you for signing up! Please verify your email by clicking the following link:',
+        IGNORE_IF_NOT_YOU: 'If you did not create this account, you can ignore this email.',
+        EMAIL_VERIFICATION_SENT: "A verification mail has send to your email address."
+
     },
     fr: {
         MISSING_FIELDS: "Certaines informations requises sont manquantes. Veuillez remplir tous les champs.",
@@ -228,7 +233,11 @@ const messages = {
         NOT_ADMIN_DENIED_ACCESS: "Cette action requiert les droits administrateur.",
         ORIGIN_NOT_ALLOWED: "L'origine de la requête n'est pas autorisée.",
         PASSWORDS_DO_NOT_MATCH: "Les mots de passe ne correspondent pas.",
-        UNDERAGE_NOT_ALLOWED: "Vous devez avoir au minimum 16 ans pour vous inscrire sur Travelers."
+        UNDERAGE_NOT_ALLOWED: "Vous devez avoir au minimum 16 ans pour vous inscrire sur Travelers.",
+        VERIFY_EMAIL_SUBJECT: "Vérification du votre adresse mail",
+        VERIFY_EMAIL_BODY: 'Merci de vous être inscrit ! Veuillez vérifier votre adresse e-mail en cliquant sur le lien suivant :',
+        IGNORE_IF_NOT_YOU: 'Si vous n\'avez pas créé de compte, vous pouvez ignorer cet e-mail.',
+        EMAIL_VERIFICATION_SENT: "Un mail de confirmation à été envoyé à votre adresse mail."
     },
 };
 

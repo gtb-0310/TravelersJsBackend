@@ -4,11 +4,11 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
     firstName: {
         type: String,
-        required: true
+        required: false
     },
     lastName: {
         type: String,
-        required: true
+        required: false
     },
     birthDate: {
         type: Date,
@@ -26,15 +26,15 @@ const userSchema = new Schema({
     },
     profilePictureUrl: {
         type: String,
-        required: true
+        required: false
     },
     description: {
         type: String,
-        required: true
+        required: false
     },
     refreshToken: {
         type: String,
-        required: true
+        required: false
     },
     languages: [{
         type: mongoose.Schema.Types.ObjectId,
