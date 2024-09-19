@@ -132,6 +132,7 @@ router.post(
     userController.createUser
 );
 
+
 /**
  * @swagger
  * /users/{id}:
@@ -258,6 +259,7 @@ router.put(
     userController.updateUserById
 );
 
+
 /**
  * @swagger
  * /users/{id}/change-password:
@@ -330,6 +332,7 @@ router.put(
     },
     userController.changePassword
 );
+
 
 /**
  * @swagger
