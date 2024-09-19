@@ -120,7 +120,7 @@ const messages = {
         VERIFY_EMAIL_BODY: 'Thank you for signing up! Please verify your email by clicking the following link:',
         IGNORE_IF_NOT_YOU: 'If you did not create this account, you can ignore this email.',
         EMAIL_VERIFICATION_SENT: "A verification mail has send to your email address.",
-        NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "You can't delete a another profil than yours."
+        NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "You can't modify or delete profil than yours."
 
     },
     fr: {
@@ -239,7 +239,7 @@ const messages = {
         VERIFY_EMAIL_BODY: 'Merci de vous être inscrit ! Veuillez vérifier votre adresse e-mail en cliquant sur le lien suivant :',
         IGNORE_IF_NOT_YOU: 'Si vous n\'avez pas créé de compte, vous pouvez ignorer cet e-mail.',
         EMAIL_VERIFICATION_SENT: "Un mail de confirmation à été envoyé à votre adresse mail.",
-        NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "Vous ne pouvez supprimer que votre profile."
+        NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "Vous ne pouvez supprimer ou modifier que votre profile."
     },
 };
 

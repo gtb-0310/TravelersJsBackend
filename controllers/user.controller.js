@@ -135,7 +135,6 @@ exports.updateUserById = async (req, res) => {
     const {
         firstName,
         lastName,
-        age,
         profilePictureUrl,
         description,
         languages,
@@ -154,7 +153,6 @@ exports.updateUserById = async (req, res) => {
 
         userToUpdate.firstName = firstName;
         userToUpdate.lastName = lastName;
-        userToUpdate.age = age;
         userToUpdate.profilePictureUrl = profilePictureUrl;
         userToUpdate.description = description;
         userToUpdate.languages = languages;

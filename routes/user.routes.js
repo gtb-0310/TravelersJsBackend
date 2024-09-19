@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const { check, validationResult } = require('express-validator');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
@@ -153,7 +154,6 @@ router.post(
  *             required:
  *               - firstName
  *               - lastName
- *               - age
  *               - profilePictureUrl
  *               - description
  *               - languages
@@ -163,8 +163,6 @@ router.post(
  *                 type: string
  *               lastName:
  *                 type: string
- *               age:
- *                 type: integer
  *               profilePictureUrl:
  *                 type: string
  *               description:
@@ -193,8 +191,6 @@ router.post(
  *                   type: string
  *                 lastName:
  *                   type: string
- *                 age:
- *                   type: integer
  *                 profilePictureUrl:
  *                   type: string
  *                 description:
@@ -217,6 +213,7 @@ router.post(
 router.put(
     '/:id',
     authenticateToken,
+    checkOwnerProfil,
     [
         (req, res, next) => {
             const lang = getLanguageFromHeaders(req) || 'en';
@@ -231,9 +228,6 @@ router.put(
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_LAST_NAME)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_LAST_NAME)
             .trim().escape(),
-        check('age')
-            .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_AGE)
-            .isInt({ min: 0 }).withMessage((value, { req }) => req.validationMessages.INVALID_AGE),
         check('profilePictureUrl')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_PROFILE_PICTURE_URL)
             .isURL().withMessage((value, { req }) => req.validationMessages.INVALID_PROFILE_PICTURE_URL),
