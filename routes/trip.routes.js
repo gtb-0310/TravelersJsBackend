@@ -139,7 +139,7 @@ const messages = require('../utils/messages');
  */
 router.get(
   '/',
-  //authenticateToken,
+  authenticateToken,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];
