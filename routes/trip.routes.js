@@ -139,7 +139,7 @@ const messages = require('../utils/messages');
  */
 router.get(
   '/',
-  authenticateToken,
+  //authenticateToken,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];
@@ -331,7 +331,7 @@ router.get(
  *     summary: Crée un nouveau trip (et un groupe associé)
  *     tags: [Trips]
  *     security:
- *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

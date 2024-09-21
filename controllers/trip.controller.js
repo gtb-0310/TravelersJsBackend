@@ -4,6 +4,8 @@ const User = require('../models/user.model');
 const mongoose = require('mongoose');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
+const { startOfDay, endOfDay } = require('../utils/dateUtils');
+
 
 /***
  * ---------------------------------------
@@ -18,30 +20,27 @@ exports.getTripsWithFilter = async (req, res) => {
     try {
         if (startDate && endDate) {
             if (dateOption === 'exact') {
-                filter.startDate = new Date(startDate);
-                filter.endDate = new Date(endDate);
+                filter.startDate = { $gte: startOfDay(startDate), $lte: endOfDay(startDate) };
+                filter.endDate = { $gte: startOfDay(endDate), $lte: endOfDay(endDate) };
             } else if (dateOption === 'range') {
-                filter.$or = [
-                    {
-                        startDate: { $gte: new Date(startDate), $lte: new Date(endDate) },
-                        endDate: { $gte: new Date(startDate), $lte: new Date(endDate) }
-                    },
-                    {
-                        startDate: { $lte: new Date(startDate) },
-                        endDate: { $gte: new Date(endDate) }
-                    }
-                ];
-            } else if (dateOption === 'start') {
-                filter.startDate = new Date(startDate);
-            } else if (dateOption === 'end') {
-                filter.endDate = new Date(endDate);
+                filter.startDate = { $gte: startOfDay(startDate) };
+                filter.endDate = { $lte: endOfDay(endDate) };
             }
-        } else if (startDate) {
-            filter.startDate = { $gte: new Date(startDate) };
-        } else if (endDate) {
-            filter.endDate = { $lte: new Date(endDate) };
+        } else {
+            if (dateOption === 'start' && startDate) {
+                filter.startDate = { $gte: startOfDay(startDate), $lte: endOfDay(startDate) };
+            } else if (dateOption === 'end' && endDate) {
+                filter.endDate = { $gte: startOfDay(endDate), $lte: endOfDay(endDate) };
+            } else {
+                if (startDate) {
+                    filter.startDate = { $gte: startOfDay(startDate) };
+                }
+                if (endDate) {
+                    filter.endDate = { $lte: endOfDay(endDate) };
+                }
+            }
         }
-
+        
 
         if (budget) {
             const [minBudget, maxBudget] = budget.split(',').map(Number);
@@ -56,24 +55,28 @@ exports.getTripsWithFilter = async (req, res) => {
 
         
         if (transport) {
+            console.log(transport);
             const transportArray = transport.split(',');
-            filter.transport = { $in: transportArray.map(id => mongoose.Types.ObjectId(id)) };
+            filter.transport = { $in: transportArray };
         }
 
         
         if (destination) {
-            filter.destination = mongoose.Types.ObjectId(destination);
+            filter.destination = destination;
         }
 
         
         if (tripType) {
-            filter.tripType = mongoose.Types.ObjectId(tripType);
+            filter.tripType = tripType;
         }
 
-
+        let matchLanguages = {};
         if (languages) {
-            filter['groupId.languages'] = mongoose.Types.ObjectId(languages);
+            const languagesArray = languages.split(',');
+            matchLanguages = { languages: { $in: languagesArray } };
         }
+
+        console.log(filter);
 
         const trips = await Trip.find(filter)
             .select('title budget startDate endDate transport destination groupId')
@@ -81,6 +84,7 @@ exports.getTripsWithFilter = async (req, res) => {
             .populate({ path: 'destination', select: 'name' })
             .populate({
                 path: 'groupId',
+                match: matchLanguages,
                 populate: {
                     path: 'languages',
                     select: 'name'
