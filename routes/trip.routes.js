@@ -347,7 +347,6 @@ router.get(
  *               - transport
  *               - destination
  *               - tripType
- *               - languages
  *             properties:
  *               title:
  *                 type: string
@@ -381,12 +380,6 @@ router.get(
  *                 type: string
  *                 format: objectId
  *                 description: ID du type de trip
- *               languages:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: objectId
- *                 description: Liste des IDs des langues parlées par l'utilisateur créateur du trip
  *     responses:
  *       201:
  *         description: Trip créé avec succès
@@ -473,7 +466,7 @@ router.get(
  */
 router.post(
   '/',
-  authenticateToken,
+  // authenticateToken,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];
@@ -511,16 +504,6 @@ router.post(
       .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_DESTINATION_ID),
     check('tripType')
       .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_TRIP_TYPE_ID),
-    check('languages')
-      .isArray({ min: 1 }).withMessage((value, { req }) => req.validationMessages.REQUIRED_LANGUAGES)
-      .custom((languages, { req }) => {
-        languages.forEach(languageId => {
-          if (!mongoose.Types.ObjectId.isValid(languageId)) {
-            throw new Error(req.validationMessages.INVALID_LANGUAGE_ID);
-          }
-        });
-        return true;
-      }),
   ],
   (req, res, next) => {
     const errors = validationResult(req);
@@ -531,6 +514,7 @@ router.post(
   },
   tripController.createTrip
 );
+
 
 /**
  * @swagger

@@ -25,7 +25,7 @@ const groupSchema = new Schema({
     }],
     trip: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
         ref: 'Trip',
     }
 }, {
