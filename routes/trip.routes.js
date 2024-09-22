@@ -466,7 +466,7 @@ router.get(
  */
 router.post(
   '/',
-  // authenticateToken,
+  authenticateToken,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];

@@ -178,52 +178,6 @@ exports.createTrip = async (req, res) => {
     }
 };
 
-// exports.createTrip = async (req, res) => {
-//     const lang = getLanguageFromHeaders(req) || 'en';
-//     const { title, startDate, endDate, budget, userId, transport, destination, tripType } = req.body;
-
-//     try {
-//         const user = await User.findById(userId).select('languages');
-//         if (!user) {
-//             return res.status(404).json({ message: messages[lang].USER_NOT_FOUND });
-//         }
-
-//         const group = new Group({
-//             name: title, 
-//             members: [userId], 
-//             administrator: userId,
-//             languages: user.languages,
-//             trip: null
-//         });
-
-        
-//         const savedGroup = await group.save();
-
-        
-//         const newTrip = new Trip({
-//             title,
-//             startDate: new Date(startDate),
-//             endDate: new Date(endDate),
-//             budget,
-//             userId,
-//             transport,
-//             destination,
-//             tripType,
-//             groupId: savedGroup._id 
-//         });
-
-        
-//         const savedTrip = await newTrip.save();
-
-//         savedGroup.trip = savedTrip._id;
-//         await savedGroup.save();
-
-//         res.status(201).json(savedTrip, savedGroup);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: messages[lang].SERVER_ERROR });
-//     }
-// };
 
 /***
  * ---------------------------------------
