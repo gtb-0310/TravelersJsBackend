@@ -260,6 +260,7 @@ router.get(
 router.delete(
     '/:id',
     authenticateToken,
+    checkAdminPrivileges,
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
       req.validationMessages = messages[lang];
