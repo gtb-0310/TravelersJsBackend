@@ -121,7 +121,8 @@ const messages = {
         IGNORE_IF_NOT_YOU: 'If you did not create this account, you can ignore this email.',
         EMAIL_VERIFICATION_SENT: "A verification mail has send to your email address.",
         NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "You can't modify or delete profil than yours.",
-        STARTDATE_MUST_BE_INFERIOR: "The start date must be less then the end date."
+        STARTDATE_MUST_BE_INFERIOR: "The start date must be less then the end date.",
+        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Trip and group deleted with succes!"
 
     },
     fr: {
@@ -241,7 +242,8 @@ const messages = {
         IGNORE_IF_NOT_YOU: 'Si vous n\'avez pas créé de compte, vous pouvez ignorer cet e-mail.',
         EMAIL_VERIFICATION_SENT: "Un mail de confirmation à été envoyé à votre adresse mail.",
         NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "Vous ne pouvez supprimer ou modifier que votre profil.",
-        STARTDATE_MUST_BE_INFERIOR: "La date de début doit être antérieure à la date de fin."
+        STARTDATE_MUST_BE_INFERIOR: "La date de début doit être antérieure à la date de fin.",
+        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Voyage et groupe associé supprimés avec succès!"
     },
 };
 

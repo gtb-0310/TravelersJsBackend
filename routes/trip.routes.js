@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const tripController = require('../controllers/trip.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
+const checkTripAdministrator = require('../middlewares/checkTripAdministrator');
 const messages = require('../utils/messages');
 
 
@@ -650,6 +651,7 @@ router.post(
 router.put(
   '/:id',
   authenticateToken,
+  checkTripAdministrator,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];
@@ -773,6 +775,7 @@ router.put(
 router.delete(
   '/:id',
   authenticateToken,
+  checkTripAdministrator,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];

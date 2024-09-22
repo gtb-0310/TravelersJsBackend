@@ -199,9 +199,10 @@ exports.updateTrip = async (req, res) => {
         if (startDate) trip.startDate = new Date(startDate);
         if (endDate) trip.endDate = new Date(endDate);
         if (budget) trip.budget = budget;
-        if (transport) trip.transport = transport.map(id => mongoose.Types.ObjectId(id));
-        if (destination) trip.destination = mongoose.Types.ObjectId(destination);
-        if (tripType) trip.tripType = mongoose.Types.ObjectId(tripType);
+        if (transport) trip.transport = transport.map(id => id);
+        if (destination) trip.destination = destination;
+        if (tripType) trip.tripType = tripType;
+
 
         const updatedTrip = await trip.save();
 
@@ -239,7 +240,7 @@ exports.deleteTripById = async (req, res) => {
 
         await Group.findByIdAndDelete(trip.groupId);
 
-        res.status(200).json({ message: messages[lang].TRIP_DELETED_SUCCESS });
+        res.status(200).json({ message: messages[lang].TRIP_AND_GROUP_DELETED_WITH_SUCCESS });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
