@@ -125,7 +125,8 @@ const messages = {
         NO_JOIN_REQUEST_FOR_USER: "You have no pending requests.",
         ADD_REQUEST_NOT_FOUND: "Add request not found.",
         USER_ADD_WITH_SUCCESS: "User add to the group with success!",
-        REQUEST_DELETED_WITH_SUCCESS: "Request delete with success!"
+        REQUEST_DELETED_WITH_SUCCESS: "Request delete with success!",
+        USER_BLOCKED_WITH_SUCCESS: "User blocked with success!"
 
     },
     fr: {
@@ -249,7 +250,8 @@ const messages = {
         NO_JOIN_REQUEST_FOR_USER: "Vous n'avez pas de demande en attente.",
         ADD_REQUEST_NOT_FOUND: "Demande d'ajout non trouvée.",
         USER_ADD_WITH_SUCCESS: "Utilisateur ajouté au groupe avec succès!",
-        REQUEST_DELETED_WITH_SUCCESS: "Requête supprimée avec succes!"
+        REQUEST_DELETED_WITH_SUCCESS: "Requête supprimée avec succes!",
+        USER_BLOCKED_WITH_SUCCESS: "Utilisateur bloqué avec succès!"
     },
 };
 

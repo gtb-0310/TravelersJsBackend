@@ -14,17 +14,12 @@ const messages = require('../utils/messages');
 
 /**
  * @swagger
- * /blocked-users/{blockingUserId}:
+ * /blocked-users:
  *   get:
  *     summary: Récupère les utilisateurs bloqués par un utilisateur spécifique
  *     tags: [Blocked users]
- *     parameters:
- *       - in: path
- *         name: blockingUserId
- *         required: true
- *         description: ID de l'utilisateur qui bloque
- *         schema:
- *           type: string
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Liste des utilisateurs bloqués
@@ -44,7 +39,7 @@ const messages = require('../utils/messages');
  *       404:
  *         description: Utilisateur bloquant non trouvé
  */
-router.get('/:blockingUserId', authenticateToken, blockedUserController.getBlockedUserById);
+router.get('/', authenticateToken, blockedUserController.getBlockedUserById);
 
 /**
  * @swagger
@@ -52,6 +47,8 @@ router.get('/:blockingUserId', authenticateToken, blockedUserController.getBlock
  *   post:
  *     summary: Bloque un utilisateur
  *     tags: [Blocked users]
+ *     security:
+ *       - bearerAuth: []  # Utilisation du token JWT
  *     requestBody:
  *       required: true
  *       content:
@@ -59,9 +56,6 @@ router.get('/:blockingUserId', authenticateToken, blockedUserController.getBlock
  *           schema:
  *             type: object
  *             properties:
- *               blockingUserId:
- *                 type: string
- *                 description: ID de l'utilisateur qui bloque
  *               blockedUserId:
  *                 type: string
  *                 description: ID de l'utilisateur à bloquer
@@ -75,7 +69,7 @@ router.get('/:blockingUserId', authenticateToken, blockedUserController.getBlock
  *               properties:
  *                 blockingUserId:
  *                   type: string
- *                   description: ID de l'utilisateur qui bloque
+ *                   description: ID de l'utilisateur qui bloque (récupéré via JWT)
  *                 blockedUserId:
  *                   type: string
  *                   description: ID de l'utilisateur bloqué
@@ -93,8 +87,6 @@ router.post(
         req.validationMessages = messages[lang];
         next();
       },
-      check('blockingUserId')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKING_USER_ID),
       check('blockedUserId')
         .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKED_USER_ID),
     ],
