@@ -6,6 +6,7 @@ const groupController = require('../controllers/group.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const checkGroupAdmin = require('../middlewares/checkGroupAdmin');
+const checkGroupAdminOrSelf = require('../middlewares/checkGroupAdminOrSelf');
 const messages = require('../utils/messages');
 
 
@@ -293,6 +294,7 @@ router.delete(
 router.delete(
     '/:groupId/users/:userId',
     authenticateToken,
+    checkGroupAdminOrSelf,
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
       req.validationMessages = messages[lang];
