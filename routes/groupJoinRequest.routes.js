@@ -101,19 +101,12 @@ router.get(
 
 /**
  * @swagger
- * /group-join/user/{userId}/join-requests:
+ * /group-join/user/me/join-requests:
  *   get:
- *     summary: L'utilisateur récupère la liste de ses demandes d'adhésions aux groupes tiers
+ *     summary: Récupère la liste des demandes d'adhésion de l'utilisateur connecté
  *     tags: [Group join requests]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'utilisateur dont on veut récupérer les demandes
  *     responses:
  *       200:
  *         description: Liste des demandes d'adhésion de l'utilisateur
@@ -123,70 +116,24 @@ router.get(
  *               type: array
  *               items:
  *                 type: object
- *                 properties:
- *                   groupId:
- *                     type: string
- *                     description: ID du groupe auquel l'utilisateur a demandé à rejoindre
- *                   firstName:
- *                     type: string
- *                     description: Prénom de l'utilisateur
- *                   lastName:
- *                     type: string
- *                     description: Nom de famille de l'utilisateur
- *                   age:
- *                     type: number
- *                     description: Âge de l'utilisateur
- *                   languages:
- *                     type: array
- *                     items:
- *                       type: string
- *                     description: Langues parlées par l'utilisateur
- *                   interests:
- *                     type: array
- *                     items:
- *                       type: string
- *                     description: Centres d'intérêt de l'utilisateur
- *                   description:
- *                     type: string
- *                     description: Description de l'utilisateur
  *       401:
- *         description: Non authentifié (token manquant ou invalide)
+ *         description: Non authentifié
  *       404:
- *         description: Aucune demande d'adhésion trouvée pour cet utilisateur
+ *         description: Aucune demande trouvée
  *       500:
- *         description: Erreur du serveur
+ *         description: Erreur serveur
  */
-router.get(
-  '/user/:userId/join-requests',
-  authenticateToken,
-  [
-    (req, res, next) => {
-      const lang = getLanguageFromHeaders(req) || 'en';
-      req.validationMessages = messages[lang];
-      next();
-    },
-    check('userId')
-      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-  groupController.getJoinRequestsByUserId
-);
+router.get('/user/me/join-requests', authenticateToken, groupController.getJoinRequestsByUserId);
 
 
 /**
  * @swagger
- * /group-join/{groupId}/join/{userId}:
+ * /group-join/{groupId}/join:
  *   post:
- *     summary: L'utilisateur envoi une requête pour rejoindre un groupe qu'il voudrait rejoindre
+ *     summary: L'utilisateur envoie une requête pour rejoindre un groupe
  *     tags: [Group join requests]
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: []  # Le token JWT est requis
  *     parameters:
  *       - in: path
  *         name: groupId
@@ -194,12 +141,6 @@ router.get(
  *         schema:
  *           type: string
  *         description: ID du groupe auquel l'utilisateur veut adhérer
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'utilisateur qui demande à rejoindre le groupe
  *     requestBody:
  *       required: false
  *       content:
@@ -223,7 +164,7 @@ router.get(
  *         description: Erreur du serveur
  */
 router.post(
-    '/:groupId/join/:userId/',
+    '/:groupId/join/',
     authenticateToken,
     checkIfAlreadyMember,
     (req, res, next) => {
@@ -234,8 +175,6 @@ router.post(
     [
       check('groupId')
         .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
-      check('userId')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
     ],
     (req, res, next) => {
       const errors = validationResult(req);

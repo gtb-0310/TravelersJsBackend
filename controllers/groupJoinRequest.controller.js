@@ -11,22 +11,22 @@ const GroupJoinRequest = require('../models/groupJoinRequest.model'),
  */
 exports.getJoinRequestsByUserId = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { userId } = req.params;
+    const userId = req.user.id;
 
     try {
+        const joinRequests = await GroupJoinRequest.find({ userId })
+            .populate('userId', 'firstName lastName age languages interests description');
 
-        const joinRequests = await GroupJoinRequest.find({ userId }).populate(
-            'userId', 'firstName lastName age languages interests description'
-        );
-
-        if(joinRequests.length === 0){
+        if (joinRequests.length === 0) {
             return res.status(404).json({ message: messages[lang].NO_JOIN_REQUEST_FOR_USER });
         }
+
         res.json(joinRequests);
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 exports.getJoinRequestsByGroupId = async (req, res) => {
 
@@ -58,7 +58,8 @@ exports.getJoinRequestsByGroupId = async (req, res) => {
 exports.askGroupJoinRequest = async (req, res) => {
 
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { groupId, userId } = req.params;
+    const { groupId } = req.params;
+    const userId = req.user.id;
 
     try {
         const group = await Group.findById(groupId);

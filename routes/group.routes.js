@@ -65,20 +65,15 @@ router.get(
 
 /**
  * @swagger
- * /groups/user/{userId}:
+ * /groups/user/groups:
  *   get:
- *     summary: Récupère les groupes d'un utilisateur par son ID
+ *     summary: Récupère les groupes de l'utilisateur authentifié
  *     tags: [Groups]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         description: ID de l'utilisateur
- *         schema:
- *           type: string
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Une liste de groupes
+ *         description: Une liste de groupes de l'utilisateur authentifié
  *         content:
  *           application/json:
  *             schema:
@@ -90,28 +85,22 @@ router.get(
  *                     type: string
  *                   name:
  *                     type: string
+ *       401:
+ *         description: Non authentifié (token manquant ou invalide)
+ *       500:
+ *         description: Erreur du serveur
  */
 router.get(
-  '/user/:userId',
+  '/user/groups',
   authenticateToken,
   (req, res, next) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     req.validationMessages = messages[lang];
     next();
   },
-  [
-    check('userId')
-      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID)
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
   groupController.getGroupsByUserId
 );
+
 
 /**
  * @swagger

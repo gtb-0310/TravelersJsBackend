@@ -12,7 +12,6 @@ const Group = require('../models/group.model'),
  * GET
  * ---------------------------------------
  */
-
 exports.getGroupById = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     const groupId = req.params.groupId;
@@ -32,15 +31,20 @@ exports.getGroupById = async (req, res) => {
 
 exports.getGroupsByUserId = async (req, res) => {
     try {
-        const groups = await Group.find({ members: req.params.userId})
+        const userId = req.user.id;
+
+        const groups = await Group.find({ members: userId })
             .populate('members')
             .populate('administrator')
-            .populate('languages')
+            .populate('languages');
+
         res.json(groups);
     } catch (err) {
+        console.error('Erreur lors de la récupération des groupes :', err);
         res.status(500).json({ message: err.message });
     }
 };
+
 
 
 /***
