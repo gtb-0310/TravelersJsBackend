@@ -5,6 +5,12 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const groupController = require('../controllers/groupJoinRequest.controller');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const validationMessages = require('../utils/messages');
+const checkGroupAdmin = require('../middlewares/checkGroupAdmin');
+const messages = require('../utils/messages');
+const canApproveAddRequest = require('../middlewares/canApproveAddRequest');
+const checkIfAlreadyMember = require('../middlewares/checkIfAlreadyMember');
+const checkDeleteRequestPermission = require('../middlewares/checkDeleteRequestPermission');
+//const checkOwnerProfil = require('../middlewares/checkOwnerProfil');
 
 /**
  * @swagger
@@ -72,6 +78,7 @@ const validationMessages = require('../utils/messages');
 router.get(
   '/:groupId/join-requests',
   authenticateToken,
+  checkGroupAdmin,
   [
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
@@ -174,7 +181,7 @@ router.get(
 
 /**
  * @swagger
- * /group-join/{groupId}/join/{userId}/{adminId}:
+ * /group-join/{groupId}/join/{userId}:
  *   post:
  *     summary: L'utilisateur envoi une requête pour rejoindre un groupe qu'il voudrait rejoindre
  *     tags: [Group join requests]
@@ -193,18 +200,16 @@ router.get(
  *         schema:
  *           type: string
  *         description: ID de l'utilisateur qui demande à rejoindre le groupe
- *       - in: path
- *         name: adminId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de l'administrateur qui gérera la demande
- *       - in: body
- *         name: message
- *         required: false
- *         schema:
- *           type: string
- *         description: Message optionnel accompagnant la demande d'adhésion
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 description: Message optionnel accompagnant la demande d'adhésion
  *     responses:
  *       201:
  *         description: Demande d'adhésion envoyée avec succès
@@ -218,8 +223,9 @@ router.get(
  *         description: Erreur du serveur
  */
 router.post(
-    '/:groupId/join/:userId/:adminId',
+    '/:groupId/join/:userId/',
     authenticateToken,
+    checkIfAlreadyMember,
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
       req.validationMessages = messages[lang];
@@ -230,8 +236,6 @@ router.post(
         .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
       check('userId')
         .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
-      check('adminId')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_ADMIN_ID),
     ],
     (req, res, next) => {
       const errors = validationResult(req);
@@ -242,7 +246,6 @@ router.post(
     },
     groupController.askGroupJoinRequest
 );
-
 
 
 /**
@@ -273,6 +276,7 @@ router.post(
 router.post(
   '/join-request/:requestId/approve',
   authenticateToken,
+  canApproveAddRequest,
   [
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
@@ -321,6 +325,7 @@ router.post(
 router.delete(
   '/join-request/:id',
   authenticateToken,
+  checkDeleteRequestPermission,
   [
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';

@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const groupController = require('../controllers/group.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
-const checkAdminPrivileges = require('../middlewares/checkAdminPrivileges');
+const checkGroupAdmin = require('../middlewares/checkGroupAdmin');
 const messages = require('../utils/messages');
 
 
@@ -260,7 +260,7 @@ router.get(
 router.delete(
     '/:id',
     authenticateToken,
-    checkAdminPrivileges,
+    checkGroupAdmin,
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
       req.validationMessages = messages[lang];
@@ -275,7 +275,6 @@ router.delete(
       }
       next();
     },
-    checkAdminPrivileges,
     groupController.deleteGroupById
   );
 

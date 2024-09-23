@@ -112,7 +112,6 @@ const messages = {
         INVALID_VERIFICATION_TOKEN: "the verification token is invalid. Ask again to a mail check up.",
         INVALID_COUNTRY_ID: "One or multiple country id is invalid.",
         SELECT_A_COUNTRY: "You need to select at least one county.",
-        NOT_ADMIN_DENIED_ACCESS: "You need to be administrator to use this function.",
         ORIGIN_NOT_ALLOWED: "Origin request not allowed.",
         PASSWORDS_DO_NOT_MATCH: "Passwords do not match.",
         UNDERAGE_NOT_ALLOWED: "You must have at least 16 years to use Travelers.",
@@ -122,7 +121,11 @@ const messages = {
         EMAIL_VERIFICATION_SENT: "A verification mail has send to your email address.",
         NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "You can't modify or delete profil than yours.",
         STARTDATE_MUST_BE_INFERIOR: "The start date must be less then the end date.",
-        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Trip and group deleted with succes!"
+        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Trip and group deleted with succes!",
+        NO_JOIN_REQUEST_FOR_USER: "You have no pending requests.",
+        ADD_REQUEST_NOT_FOUND: "Add request not found.",
+        USER_ADD_WITH_SUCCESS: "User add to the group with success!",
+        REQUEST_DELETED_WITH_SUCCESS: "Request delete with success!"
 
     },
     fr: {
@@ -134,7 +137,6 @@ const messages = {
         SUCCESS: "L'opération a été exécutée avec succès.",
         CONNECTION_ERROR: "Une erreur est survenue pendant la connexion, veuillez réesayer.",
         GROUP_NOT_FOUND: "Groupe non trouvé",
-        NOT_ADMIN_DENIED_ACCESS: "Vous devez être administrateur.",
         GROUP_AND_MESSAGES_DELETED: "Le groupe et les messages associés ont été correctement supprimés.",
         USER_REMOVE_FROM_GROUP_SUCCESS: "Utilisateur supprimé du groupe avec succès!",
         ERROR_DB_CONNECTION: "Echec de connexion à la base de données, veuillez réessayer",
@@ -243,7 +245,11 @@ const messages = {
         EMAIL_VERIFICATION_SENT: "Un mail de confirmation à été envoyé à votre adresse mail.",
         NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "Vous ne pouvez supprimer ou modifier que votre profil.",
         STARTDATE_MUST_BE_INFERIOR: "La date de début doit être antérieure à la date de fin.",
-        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Voyage et groupe associé supprimés avec succès!"
+        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Voyage et groupe associé supprimés avec succès!",
+        NO_JOIN_REQUEST_FOR_USER: "Vous n'avez pas de demande en attente.",
+        ADD_REQUEST_NOT_FOUND: "Demande d'ajout non trouvée.",
+        USER_ADD_WITH_SUCCESS: "Utilisateur ajouté au groupe avec succès!",
+        REQUEST_DELETED_WITH_SUCCESS: "Requête supprimée avec succes!"
     },
 };
 
