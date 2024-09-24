@@ -1,10 +1,13 @@
 const Trip = require('../models/trip.model');
 const Group = require('../models/group.model');
 const User = require('../models/user.model');
+const GroupMessage = require('../models/groupMessage.model');
+const GroupJoinRequests = require('../models/groupJoinRequest.model');
 const mongoose = require('mongoose');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const { startOfDay, endOfDay } = require('../utils/dateUtils');
+
 
 
 /***
@@ -135,7 +138,8 @@ exports.getTripById = async (req, res) => {
  */
 exports.createTrip = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { title, startDate, endDate, budget, userId, transport, destination, tripType } = req.body;
+    const { title, startDate, endDate, budget, transport, destination, tripType } = req.body;
+    const userId = req.user.id;
 
     try {
         const user = await User.findById(userId).select('languages');
@@ -148,7 +152,7 @@ exports.createTrip = async (req, res) => {
             startDate: new Date(startDate),
             endDate: new Date(endDate),
             budget,
-            userId,
+            userId: userId,
             transport,
             destination,
             tripType
@@ -238,9 +242,15 @@ exports.deleteTripById = async (req, res) => {
             return res.status(404).json({ message: messages[lang].TRIP_NOT_FOUND });
         }
 
-        await Group.findByIdAndDelete(trip.groupId);
+        const groupId = trip.groupId;
+        const group = await Group.findByIdAndDelete(groupId);
 
-        res.status(200).json({ message: messages[lang].TRIP_AND_GROUP_DELETED_WITH_SUCCESS });
+        if (group) {
+            await GroupMessage.deleteMany({ groupId: groupId });
+            await GroupJoinRequests.deleteMany({ groupId: groupId });
+        }
+
+        res.status(200).json({ message: messages[lang].TRIP_GROUP_AND_RELATIVE_ITEMS });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });

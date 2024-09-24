@@ -13,8 +13,6 @@ async function checkGroupAdmin(req, res, next) {
   
   try {
     const group = await Group.findById(groupId);
-
-    console.log(groupId);
     
     if (!group) {
       return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });

@@ -47,13 +47,13 @@ exports.getGroupMessageById = async (req, res) => {
  * POST
  * ---------------------------------------
  */
-
 exports.sendMessage = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { groupId, senderId} = req.params;
+    const { groupId } = req.params;
     const { content } = req.body;
+    const senderId = req.user.id;
 
-    if(!content || content.trim() === "" ){
+    if (!content || content.trim() === "") {
         return res.status(400).json({ message: messages[lang].MSG_REQUIRED });
     }
 
@@ -67,11 +67,12 @@ exports.sendMessage = async (req, res) => {
 
         const savedMessage = await newMessage.save();
 
-        return res.status(201).json(savedMessage);
+        return res.status(201).json({ message: messages[lang].MESSAGE_SEND_WITH_SUCCES });
     } catch (err) {
         return res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 /***
  * ---------------------------------------

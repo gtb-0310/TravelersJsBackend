@@ -2,7 +2,8 @@ const Group = require('../models/group.model'),
     Trip = require('../models/trip.model'),
     GroupMessage = require('../models/groupMessage.model'),
     User = require('../models/user.model'),
-    languages = require('../models/language.model'),
+    Languages = require('../models/language.model'),
+    GroupJoinRequests = require('../models/groupJoinRequest.model');
     getLanguageFromHeaders = require('../utils/languageUtils'),
     messages = require('../utils/messages');
 
@@ -45,82 +46,65 @@ exports.getGroupsByUserId = async (req, res) => {
     }
 };
 
-
-
-/***
- * ---------------------------------------
- * POST
- * ---------------------------------------
- */
-// exports.createGroup = async (req, res) => {
-//     const { trip, name, members, administrator, languages } = req.body;
-
-//     try {
-
-//         const newGroup = new Group({
-//             trip,
-//             name,
-//             members,
-//             administrator,
-//             languages
-//         });
-
-//         const savedGroup = await newGroup.save();
-//         res.status(201).json(savedGroup);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message })
-//     }
-// };
-
-/***
- * ---------------------------------------
- * PUT
- * ---------------------------------------
- */
-
-exports.addUserToGroup = async (req, res) => {
-    try {
-        const { groupId, userId } = req.params;
-        const lang = getLanguageFromHeaders(req) || 'en';
-
-        const group = await Group.findById(groupId);
-
-        if (!group) {
-            return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });
-        }
-
-    
-        if (group.members.includes(userId)) {
-            return res.status(400).json({ message: messages[lang].USER_ALREADY_IN_GROUP });
-        }
-
-        
-        group.members.push(userId);
-
-        const updatedGroup = await group.save();
-
-        res.json({ message: messages[lang].USER_ADDED_TO_GROUP_SUCCESS, group: updatedGroup });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
-
-
 /**
  * -----------------------------------------------------
  * ADMINISTRATOR FUNCTIONS
  * ----------------------------------------------------- 
  **/
 
+
+/***
+ * ---------------------------------------
+ * PUT
+ * ---------------------------------------
+ */
+exports.dissolveGroupById = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const groupId = req.params.id;
+
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });
+        }
+
+        await GroupMessage.deleteMany({ groupId: groupId });
+        await GroupJoinRequests.deleteMany({ groupId: groupId });
+
+        group.members = [];
+        group.languages = [];
+
+        const admin = await User.findById(group.administrator);
+
+        if (!admin) {
+            return res.status(404).json({ message: messages[lang].ADMIN_NOT_FOUND });
+        }
+
+        group.members.push(admin._id);
+
+        const adminLanguages = admin.languages || [];
+        group.languages = [...new Set(adminLanguages)];
+
+        await group.save();
+
+        res.json({ message: messages[lang].GROUP_DISSOLVED_WITH_SUCCESS });
+    } catch (err) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+};
+
+
 /***
  * ---------------------------------------
  * DELETE
  * ---------------------------------------
  */
-exports.deleteGroupById = async (req, res) => {
+exports.removeUserFromGroup = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const groupId = req.params.id;
+    const { groupId, userId } = req.params;
+
+    // console.log(userId);
+    // console.log(groupId);
 
     try {
         const group = await Group.findById(groupId);
@@ -129,28 +113,35 @@ exports.deleteGroupById = async (req, res) => {
             return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });
         }
 
-        await GroupMessage.deleteMany({ group: groupId });
-
-        await group.remove();
-
-        res.json({ message: messages[lang].GROUP_AND_MESSAGES_DELETED });
-    } catch (err) {
-        res.status(500).json({ message: messages[lang].SERVER_ERROR });
-    }
-};
-
-
-
-
-
-exports.removeUserFromGroup = async (req, res) => {
-    const lang = getLanguageFromHeaders(req) || 'en';
-    const { groupId, userId } = req.params;
-
-    try {
-        const group = await Group.findById(groupId);
+        if (!group.members.includes(userId)) {
+            return res.status(404).json({ message: messages[lang].USER_NOT_IN_GROUP });
+        }
 
         group.members = group.members.filter(member => member.toString() !== userId);
+
+        if (group.administrator.toString() === userId) {
+            if (group.members.length > 0) {
+                const newAdmin = group.members[0];
+                group.administrator = newAdmin;
+
+                const trip = await Trip.findOne({ groupId: groupId });
+                if (trip) {
+                    trip.userId = group.administrator;
+                    await trip.save();
+                }
+            } else {
+                return res.status(403).json({
+                    message: messages[lang].LAST_MEMBER_LEAVING,
+                    suggestion: messages[lang].SUGGEST_TRIP_DELETION,
+                });
+            }
+        }
+
+        const remainingMembers = await User.find({ _id: { $in: group.members } });
+
+        group.languages = [...new Set(remainingMembers.flatMap(member => member.languages.map(lang => lang.toString())))];
+
+        console.log('Group avant sauvegarde (sans doublons dans les langues) :', group);
 
         const updatedGroup = await group.save();
 

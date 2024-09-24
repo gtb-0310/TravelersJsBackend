@@ -344,7 +344,6 @@ router.get(
  *               - startDate
  *               - endDate
  *               - budget
- *               - userId
  *               - transport
  *               - destination
  *               - tripType
@@ -363,10 +362,6 @@ router.get(
  *               budget:
  *                 type: number
  *                 description: Le budget estimé pour le trip
- *               userId:
- *                 type: string
- *                 format: objectId
- *                 description: ID de l'utilisateur créateur du trip
  *               transport:
  *                 type: array
  *                 items:
@@ -489,8 +484,6 @@ router.post(
       }),
     check('budget')
       .isNumeric().withMessage((value, { req }) => req.validationMessages.INVALID_BUDGET),
-    check('userId')
-      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
     check('transport')
       .isArray({ min: 1 }).withMessage((value, { req }) => req.validationMessages.REQUIRED_TRANSPORT)
       .custom((transport, { req }) => {

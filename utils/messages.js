@@ -121,12 +121,17 @@ const messages = {
         EMAIL_VERIFICATION_SENT: "A verification mail has send to your email address.",
         NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "You can't modify or delete profil than yours.",
         STARTDATE_MUST_BE_INFERIOR: "The start date must be less then the end date.",
-        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Trip and group deleted with succes!",
+        TRIP_GROUP_AND_RELATIVE_ITEMS: "Trip, group, group messages and group join requests deleted with succès!",
         NO_JOIN_REQUEST_FOR_USER: "You have no pending requests.",
         ADD_REQUEST_NOT_FOUND: "Add request not found.",
         USER_ADD_WITH_SUCCESS: "User add to the group with success!",
         REQUEST_DELETED_WITH_SUCCESS: "Request delete with success!",
-        USER_BLOCKED_WITH_SUCCESS: "User blocked with success!"
+        USER_BLOCKED_WITH_SUCCESS: "User blocked with success!",
+        GROUP_DISSOLVED_WITH_SUCCESS: "Group dissolved with succes!",
+        USER_NOT_IN_GROUP: "User not in group.",
+        LAST_MEMBER_LEAVING: "You are the last member in the group.",
+        SUGGEST_TRIP_DELETION: "To completely delete a group, delete the associated trip.",
+        MESSAGE_SEND_WITH_SUCCES: "Message send with succes!"
 
     },
     fr: {
@@ -246,12 +251,17 @@ const messages = {
         EMAIL_VERIFICATION_SENT: "Un mail de confirmation à été envoyé à votre adresse mail.",
         NOT_ALLOWED_TO_DELETE_OTHER_PROFILE: "Vous ne pouvez supprimer ou modifier que votre profil.",
         STARTDATE_MUST_BE_INFERIOR: "La date de début doit être antérieure à la date de fin.",
-        TRIP_AND_GROUP_DELETED_WITH_SUCCESS: "Voyage et groupe associé supprimés avec succès!",
+        TRIP_GROUP_AND_RELATIVE_ITEMS: "Voyage, groupe, messages de groupes et requêtes pour se joindre au groupe supprimés avec succès!",
         NO_JOIN_REQUEST_FOR_USER: "Vous n'avez pas de demande en attente.",
         ADD_REQUEST_NOT_FOUND: "Demande d'ajout non trouvée.",
         USER_ADD_WITH_SUCCESS: "Utilisateur ajouté au groupe avec succès!",
         REQUEST_DELETED_WITH_SUCCESS: "Requête supprimée avec succes!",
-        USER_BLOCKED_WITH_SUCCESS: "Utilisateur bloqué avec succès!"
+        USER_BLOCKED_WITH_SUCCESS: "Utilisateur bloqué avec succès!",
+        GROUP_DISSOLVED_WITH_SUCCESS: "Groupe dissous avec succès!",
+        USER_NOT_IN_GROUP: "L'utilisateur n'est pas membre du groupe.",
+        LAST_MEMBER_LEAVING: "Vous êtes le dernier membre du groupe.",
+        SUGGEST_TRIP_DELETION: "Pour complètement supprimer un groupe, supprimez le trip associé.",
+        MESSAGE_SEND_WITH_SUCCES: "Message envoyé avec succès!"
     },
 };
 

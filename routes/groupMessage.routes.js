@@ -156,7 +156,7 @@ router.get(
 
 /**
  * @swagger
- * /group-messages/{groupId}/message/{senderId}:
+ * /group-messages/{groupId}/sender/message:
  *   post:
  *     summary: Send a new message in a group
  *     tags: [Group Messages]
@@ -169,18 +169,16 @@ router.get(
  *         schema:
  *           type: string
  *         description: The ID of the group
- *       - in: path
- *         name: senderId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the sender
- *       - in: body
- *         name: content
- *         required: true
- *         schema:
- *           type: string
- *         description: The message content
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: The message content
  *     responses:
  *       201:
  *         description: Message sent successfully
@@ -211,18 +209,16 @@ router.get(
  *         description: Server error
  */
 router.post(
-  '/:groupId/message/:senderId',
+  '/:groupId/sender/message',
   authenticateToken,
   [
     (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-      },
+      const lang = getLanguageFromHeaders(req) || 'en';
+      req.validationMessages = messages[lang];
+      next();
+    },
     check('groupId')
       .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
-    check('senderId')
-      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
     check('content')
       .notEmpty().withMessage((value, { req }) => req.validationMessages.MSG_REQUIRED),
   ],
@@ -235,6 +231,7 @@ router.post(
   },
   groupMessageController.sendMessage
 );
+
 
 /**
  * @swagger
