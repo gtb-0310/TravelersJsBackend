@@ -10,12 +10,13 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
  */
 exports.getConversationByGroupId = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const groupId = req.params.id;
+    const groupId = req.params.groupId;
+
     try {
         const conversation = await GroupMessage.find({ groupId: groupId});
 
         if (!conversation || conversation.length === 0) {
-            return res.status(404).json({ message: messages[lang].GROUP_CONVERSATION_NOT_FOUND });
+            return res.status(404).json({ message: messages[lang].NO_CONVERS_FOR_GROUP });
         }
 
         return res.status(200).json({ conversation });

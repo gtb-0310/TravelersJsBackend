@@ -103,9 +103,6 @@ exports.removeUserFromGroup = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     const { groupId, userId } = req.params;
 
-    // console.log(userId);
-    // console.log(groupId);
-
     try {
         const group = await Group.findById(groupId);
 
@@ -140,8 +137,6 @@ exports.removeUserFromGroup = async (req, res) => {
         const remainingMembers = await User.find({ _id: { $in: group.members } });
 
         group.languages = [...new Set(remainingMembers.flatMap(member => member.languages.map(lang => lang.toString())))];
-
-        console.log('Group avant sauvegarde (sans doublons dans les langues) :', group);
 
         const updatedGroup = await group.save();
 

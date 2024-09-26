@@ -1,4 +1,4 @@
-const User = require('../models/user.model');
+//const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
@@ -9,10 +9,10 @@ async function checkIfAlreadyMember(req, res, next) {
     const groupId = req.params.groupId;
 
     try {
-        const user = await User.findById(userId);
+        //const user = await User.findById(userId);
         const group = await Group.findById(groupId);
 
-        if(!user){
+        if(!userId){
             return res.status(404).json({ message: messages[lang].USER_NOT_FOUND });
         }
 

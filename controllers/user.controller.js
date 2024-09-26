@@ -93,8 +93,6 @@ exports.createUser = async (req, res) => {
 
         const savedUser = await newUser.save();
 
-        console.log(savedUser);
-
         const verificationUrl = `http://localhost:3000/auth/verify-email/${verificationToken}`;
 
 

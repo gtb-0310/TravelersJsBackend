@@ -310,6 +310,7 @@ router.put(
 router.put(
     '/:id/change-password',
     authenticateToken,
+    checkOwnerProfil,
     [
         (req, res, next) => {
             const lang = getLanguageFromHeaders(req) || 'en';

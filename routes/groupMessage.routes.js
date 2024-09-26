@@ -5,6 +5,9 @@ const groupMessageController = require('../controllers/groupMessage.controller')
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const validationMessages = require('../utils/messages');
+const checkIfUserIsGroupMember = require('../middlewares/checkIfUserIsGroupMember');
+const checkMessageSender = require('../middlewares/checkMessageSender');
+const checkMessageSenderOrGroupAdmin = require('../middlewares/checkMessageSenderOrGroupAdmin');
 
 /**
  * @swagger
@@ -67,6 +70,7 @@ const validationMessages = require('../utils/messages');
 router.get(
   '/:groupId/conversation',
   authenticateToken,
+  checkIfUserIsGroupMember,
   [
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
@@ -211,6 +215,7 @@ router.get(
 router.post(
   '/:groupId/sender/message',
   authenticateToken,
+  checkIfUserIsGroupMember,
   [
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
@@ -248,12 +253,16 @@ router.post(
  *         schema:
  *           type: string
  *         description: The ID of the message
- *       - in: body
- *         name: content
- *         required: true
- *         schema:
- *           type: string
- *         description: The new content of the message
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: The new content of the message
  *     responses:
  *       200:
  *         description: Message updated successfully
@@ -288,6 +297,7 @@ router.post(
 router.put(
   '/message/:id',
   authenticateToken,
+  checkMessageSender,
   [
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
@@ -337,6 +347,7 @@ router.put(
 router.delete(
   '/message/:id',
   authenticateToken,
+  checkMessageSenderOrGroupAdmin,
   [
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';

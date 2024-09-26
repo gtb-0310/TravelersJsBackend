@@ -58,7 +58,6 @@ exports.getTripsWithFilter = async (req, res) => {
 
         
         if (transport) {
-            console.log(transport);
             const transportArray = transport.split(',');
             filter.transport = { $in: transportArray };
         }
@@ -78,8 +77,6 @@ exports.getTripsWithFilter = async (req, res) => {
             const languagesArray = languages.split(',');
             matchLanguages = { languages: { $in: languagesArray } };
         }
-
-        console.log(filter);
 
         const trips = await Trip.find(filter)
             .select('title budget startDate endDate transport destination groupId')

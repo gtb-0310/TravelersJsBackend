@@ -42,7 +42,7 @@ const messages = {
         INVALID_ADMIN_ID: 'One or more administrator IDs are invalid.',
         REQUIRED_LANGUAGES: 'At least one language is required.',
         INVALID_LANGUAGE_ID: 'One or more language IDs are invalid.',
-        GROUP_CONVERSATION_NOT_FOUND: "Conversation not found.",
+        NO_CONVERS_FOR_GROUP: "There is no conversation for this group.",
         MSG_REQUIRED: "A message is required.",
         MSG_NOT_FOUND: "Message not found.",
         MSG_DELETED: "Message deleted with succes!",
@@ -131,7 +131,10 @@ const messages = {
         USER_NOT_IN_GROUP: "User not in group.",
         LAST_MEMBER_LEAVING: "You are the last member in the group.",
         SUGGEST_TRIP_DELETION: "To completely delete a group, delete the associated trip.",
-        MESSAGE_SEND_WITH_SUCCES: "Message send with succes!"
+        MESSAGE_SEND_WITH_SUCCES: "Message send with succes!",
+        ONLY_GROUP_MEMBER_READ_MESSAGES: "Only group members are allowed to read/send messages in the group conversation.",
+        FORBIDDEN_NOT_MESSAGE_AUTHOR: "You can't modify a message that not belong to you.",
+        FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "You need to be the author of the message or the group administrator."
 
     },
     fr: {
@@ -171,7 +174,7 @@ const messages = {
         INVALID_ADMIN_ID: 'Un ou plusieurs IDs d\'administrateur sont invalides.',
         REQUIRED_LANGUAGES: 'Au moins une langue est requise.',
         INVALID_LANGUAGE_ID: 'Un ou plusieurs IDs de langue sont invalides.',
-        GROUP_CONVERSATION_NOT_FOUND: "Conversation non trouvée.",
+        NO_CONVERS_FOR_GROUP: "Il n'existe pas de conversation pour ce groupe.",
         MSG_REQUIRED: "Message requis.",
         MSG_NOT_FOUND: "Message non trouvé.",
         MSG_DELETED: "Message supprimé avec succès!",
@@ -261,7 +264,10 @@ const messages = {
         USER_NOT_IN_GROUP: "L'utilisateur n'est pas membre du groupe.",
         LAST_MEMBER_LEAVING: "Vous êtes le dernier membre du groupe.",
         SUGGEST_TRIP_DELETION: "Pour complètement supprimer un groupe, supprimez le trip associé.",
-        MESSAGE_SEND_WITH_SUCCES: "Message envoyé avec succès!"
+        MESSAGE_SEND_WITH_SUCCES: "Message envoyé avec succès!",
+        ONLY_GROUP_MEMBER_READ_MESSAGES: "Seuls les membres du group sont autorisés à lire/envoyer  un message.",
+        FORBIDDEN_NOT_MESSAGE_AUTHOR: "Vous ne pouvez pas modifier un message qui ne vous appartient pas.",
+        FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "Vous devez être l'auteur du message ou l'administrateur du groupe."
     },
 };
 

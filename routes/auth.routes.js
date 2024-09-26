@@ -53,30 +53,30 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
  *         description: Erreur du serveur
  */
 router.post(
-    '/login',
-    [
-      (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-      },
-      check('email')
-        .isEmail().withMessage((value, { req }) => req.validationMessages.INVALID_EMAIL)
-        .normalizeEmail(),
-      check('password')
-        .isLength({ min: 5 }).withMessage((value, { req }) => req.validationMessages.PASSWORD_TOO_SHORT)
-        .trim().escape(),
-    ],
+  '/login',
+  [
     (req, res, next) => {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+      const lang = getLanguageFromHeaders(req) || 'en';
+      req.validationMessages = messages[lang];
       next();
     },
-    authController.login
-  );
-  
+    check('email')
+      .isEmail().withMessage((value, { req }) => req.validationMessages.INVALID_EMAIL)
+      .normalizeEmail(),
+    check('password')
+      .isLength({ min: 5 }).withMessage((value, { req }) => req.validationMessages.PASSWORD_TOO_SHORT)
+      .trim().escape(),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  authController.login
+);
+
 
 /**
  * @swagger
@@ -134,7 +134,7 @@ router.post(
     },
   authController.refreshToken
 );
-  
+
 
 /**
  * @swagger
@@ -183,6 +183,7 @@ router.post(
   },
   authController.logout
 );
+
 
 /**
  * @swagger
