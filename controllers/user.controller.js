@@ -154,12 +154,27 @@ exports.updateUserById = async (req, res) => {
         userToUpdate.lastName = lastName;
         userToUpdate.profilePictureUrl = profilePictureUrl;
         userToUpdate.description = description;
+        const oldLanguages = userToUpdate.languages;
         userToUpdate.languages = languages;
         userToUpdate.interests = interests;
 
+
         const updatedUser = await userToUpdate.save();
 
+
+        if (oldLanguages !== languages) {
+            const groups = await Group.find({ members: userId });
+
+            for (let group of groups) {
+                const members = await User.find({ _id: { $in: group.members } });
+                const updatedLanguages = [...new Set(members.flatMap(member => member.languages.map(lang => lang.toString())))];
+                group.languages = updatedLanguages;
+                await group.save();
+            }
+        }
+
         res.status(200).json(updatedUser);
+
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -307,7 +322,12 @@ exports.deleteUserProfilById = async (req, res) => {
 
             group.members.pull(userId);
 
+            const remainingMembers = await User.find({ _id: { $in: group.members } });
+            const updatedLanguages = [...new Set(remainingMembers.flatMap(member => member.languages.map(lang => lang.toString())))];
+
+            group.languages = updatedLanguages;
             await group.save();
+
         }
 
 

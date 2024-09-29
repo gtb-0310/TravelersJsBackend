@@ -1,0 +1,27 @@
+const PrivateMessage = require('../models/privateMessage.model');
+const messages = require('../utils/messages');
+const getLanguageFromHeaders = require('../utils/languageUtils');
+
+async function checkPrivateMessageSender(req, res, next) {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const messageId = req.params.id;
+    const userId = req.user.id;
+
+    try {
+        const privateMessage = await PrivateMessage.findById(messageId);
+
+        if (!privateMessage) {
+            return res.status(404).json({ message: messages[lang].MSG_NOT_FOUND });
+        }
+
+        if (privateMessage.senderId.toString() !== userId) {
+            return res.status(403).json({ message: messages[lang].FORBIDDEN_NOT_MESSAGE_AUTHOR });
+        }
+
+        next();
+    } catch (err) {
+        return res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+}
+
+module.exports = checkPrivateMessageSender;

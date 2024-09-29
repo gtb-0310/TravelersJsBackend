@@ -48,18 +48,19 @@ exports.getPrivateMessageById = async (req, res) => {
  */
 exports.sendMessage = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { senderId, recipientId, content } = req.body;
+    const senderId = req.user.id;
+    const { recipientId, content } = req.body;
 
     try {
         let conversation = await PrivateConversation.findOne({
             participants: { $all: [senderId, recipientId] }
         });
 
+
         
         if (!conversation) {
             conversation = new PrivateConversation({
-                participants: [senderId, recipientId],
-                lastMessage: null
+                participants: [senderId, recipientId]
             });
             await conversation.save();
         }
@@ -68,13 +69,21 @@ exports.sendMessage = async (req, res) => {
             conversationId: conversation._id,
             senderId,
             recipientId,
-            content
+            content,
+            timestamp: new Date(),
+            isRead: false
         });
 
         const savedMessage = await newMessage.save();
 
+        conversation.messages.push(savedMessage._id);
         
-        conversation.lastMessage = savedMessage._id;
+        conversation.lastMessage = {
+            senderId: savedMessage.senderId,
+            content: savedMessage.content,
+            timestamp: savedMessage.timestamp
+        };
+
         await conversation.save();
 
         res.status(201).json(savedMessage);
@@ -115,6 +124,7 @@ exports.markLastMessageAsRead = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
 
     try {
+        console.log("Identifiant de la conversation : ", conversationId);
         const conversation = await PrivateConversation.findById(conversationId);
         if (!conversation) {
             return res.status(404).json({ message: messages[lang].PRIVATE_CONVERS_NOT_FOUND });
@@ -152,14 +162,30 @@ exports.deleteMessageById = async (req, res) => {
             return res.status(404).json({ message: messages[lang].PRIVATE_MSG_NOT_FOUND });
         }
 
-
-        await PrivateConversation.updateOne(
-            { lastMessage: id },
-            { $unset: { lastMessage: "" } }
+        let conversation = await PrivateConversation.findOneAndUpdate(
+            { messages: id },
+            { $pull: { messages: id } },
+            { new: true }
         );
+
+        if (conversation && conversation.messages.length === 0) {
+            await PrivateConversation.findByIdAndDelete(conversation._id);
+        } else if (conversation && conversation.lastMessage.toString() === id) {
+            const lastMessage = await PrivateMessage.findOne({ conversationId: conversation._id })
+                .sort({ timestamp: -1 });
+
+            if (lastMessage) {
+                conversation.lastMessage = lastMessage._id;
+            } else {
+                conversation.lastMessage = null;
+            }
+
+            await conversation.save();
+        }
 
         res.status(200).json({ message: messages[lang].MESSAGE_DELETED_SUCCESS });
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+

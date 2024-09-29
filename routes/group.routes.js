@@ -114,7 +114,7 @@ router.get(
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id  # ici on aligne avec le paramètre utilisé dans la route Express
+ *         name: id
  *         required: true
  *         schema:
  *           type: string

@@ -139,6 +139,8 @@ router.post(
  *   put:
  *     summary: Met à jour les informations d'un utilisateur par son ID
  *     tags: [Utilisateurs]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -221,6 +223,8 @@ router.put(
             req.validationMessages = messages[lang];
             next();
         },
+        check('id')
+        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
         check('firstName')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_FIRST_NAME)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_FIRST_NAME)

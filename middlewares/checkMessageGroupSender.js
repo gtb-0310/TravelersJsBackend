@@ -2,7 +2,7 @@ const GroupMessage = require('../models/groupMessage.model');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 
-async function checkMessageOwner(req, res, next) {
+async function checkMessageGroupSender(req, res, next) {
     const lang = getLanguageFromHeaders(req) || 'en';
     const messageId = req.params.id;
     const userId = req.user.id;
@@ -25,4 +25,4 @@ async function checkMessageOwner(req, res, next) {
     }
 }
 
-module.exports = checkMessageOwner;
+module.exports = checkMessageGroupSender;

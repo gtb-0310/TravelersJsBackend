@@ -5,6 +5,8 @@ const privateMessageController = require('../controllers/privateMessage.controll
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const validationMessages = require('../utils/messages');
+const checkPrivateMessageSender = require('../middlewares/checkPrivateMessageSender');
+const checkIfConversationMember = require('../middlewares/checkIfConversationMember');
 
 /**
  * @swagger
@@ -19,6 +21,8 @@ const validationMessages = require('../utils/messages');
  *   get:
  *     summary: Retrieve all messages in a specific conversation
  *     tags: [Private Messages]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: conversationId
@@ -36,7 +40,8 @@ const validationMessages = require('../utils/messages');
  */
 router.get(
     '/conversation/:conversationId',
-    authenticateToken, 
+    authenticateToken,
+    checkIfConversationMember, 
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
@@ -62,6 +67,8 @@ router.get(
  *   get:
  *     summary: Retrieve a specific message by its ID
  *     tags: [Private Messages]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -105,6 +112,8 @@ router.get(
  *   post:
  *     summary: Send a new private message
  *     tags: [Private Messages]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -112,9 +121,6 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               senderId:
- *                 type: string
- *                 description: ID of the message sender
  *               recipientId:
  *                 type: string
  *                 description: ID of the message recipient
@@ -124,6 +130,8 @@ router.get(
  *     responses:
  *       201:
  *         description: Message sent successfully
+ *       400:
+ *         description: Invalid input data
  *       500:
  *         description: Server error
  */
@@ -136,8 +144,6 @@ router.post(
         next();
     },
     [
-        check('senderId')
-            .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
         check('recipientId')
             .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
         check('content')
@@ -159,6 +165,8 @@ router.post(
  *   put:
  *     summary: Update the content of a specific message by its ID
  *     tags: [Private Messages]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -187,6 +195,7 @@ router.post(
 router.put(
     '/:id',
     authenticateToken,
+    checkPrivateMessageSender,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
@@ -212,6 +221,8 @@ router.put(
  *   put:
  *     summary: Mark the last message in a conversation as read
  *     tags: [Private Messages]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: conversationId
@@ -255,6 +266,8 @@ router.put(
  *   delete:
  *     summary: Delete a specific message by its ID
  *     tags: [Private Messages]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -273,6 +286,7 @@ router.put(
 router.delete(
     '/:id',
     authenticateToken,
+    checkPrivateMessageSender,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];

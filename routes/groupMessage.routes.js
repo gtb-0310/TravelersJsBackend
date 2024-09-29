@@ -6,7 +6,7 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const validationMessages = require('../utils/messages');
 const checkIfUserIsGroupMember = require('../middlewares/checkIfUserIsGroupMember');
-const checkMessageSender = require('../middlewares/checkMessageSender');
+const checkMessageGroupSender = require('../middlewares/checkMessageGroupSender');
 const checkMessageSenderOrGroupAdmin = require('../middlewares/checkMessageSenderOrGroupAdmin');
 
 /**
@@ -297,7 +297,7 @@ router.post(
 router.put(
   '/message/:id',
   authenticateToken,
-  checkMessageSender,
+  checkMessageGroupSender,
   [
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';

@@ -134,7 +134,10 @@ const messages = {
         MESSAGE_SEND_WITH_SUCCES: "Message send with succes!",
         ONLY_GROUP_MEMBER_READ_MESSAGES: "Only group members are allowed to read/send messages in the group conversation.",
         FORBIDDEN_NOT_MESSAGE_AUTHOR: "You can't modify a message that not belong to you.",
-        FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "You need to be the author of the message or the group administrator."
+        FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "You need to be the author of the message or the group administrator.",
+        CONVERSATION_NOT_FOUND: "Conversation not found.",
+        USER_NOT_IN_CONVERSATION: "You need to be member of the conversation.",
+        LAST_MESSAGE_MARKED_AS_READ: "Last message marked as read."
 
     },
     fr: {
@@ -267,7 +270,10 @@ const messages = {
         MESSAGE_SEND_WITH_SUCCES: "Message envoyé avec succès!",
         ONLY_GROUP_MEMBER_READ_MESSAGES: "Seuls les membres du group sont autorisés à lire/envoyer  un message.",
         FORBIDDEN_NOT_MESSAGE_AUTHOR: "Vous ne pouvez pas modifier un message qui ne vous appartient pas.",
-        FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "Vous devez être l'auteur du message ou l'administrateur du groupe."
+        FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "Vous devez être l'auteur du message ou l'administrateur du groupe.",
+        CONVERSATION_NOT_FOUND: "Aucune conversation trouvée.",
+        USER_NOT_IN_CONVERSATION: "Vous devez être membre de la conversation.",
+        LAST_MESSAGE_MARKED_AS_READ: "Dernier message de la conversation marqué comme lu."
     },
 };
 

@@ -11,15 +11,15 @@ const privateConversationSchema = new Schema({
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true
+            required: false
         },
         content: {
             type: String,
-            required: true
+            required: false
         },
         timestamp: {
             type: Date,
-            required: true
+            required: false
         }
     },
     messages: [{
