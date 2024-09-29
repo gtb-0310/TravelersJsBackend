@@ -5,7 +5,7 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
 
 
 exports.getAllConversationsByUserId = async (req, res) => {
-    const { userId } = req.params;
+    const userId = req.user.id;
     const lang = getLanguageFromHeaders(req) || 'en';
 
     try {

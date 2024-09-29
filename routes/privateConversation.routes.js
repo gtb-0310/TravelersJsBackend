@@ -15,17 +15,12 @@ const messages = require('../utils/messages');
 
 /**
  * @swagger
- * /private-conversations/user/{userId}:
+ * /private-conversations/user:
  *   get:
- *     summary: Get all conversations for a user
+ *     summary: Get all conversations for the connected user
  *     tags: [Private Conversations]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         description: ID of the user
- *         schema:
- *           type: string
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of conversations
@@ -64,33 +59,22 @@ const messages = require('../utils/messages');
  *                             type: string
  *                           firstName:
  *                             type: string
- *                           lastName:
- *                             type: string
+ *                             lastName:
+ *                               type: string
  *       404:
  *         description: No conversations found
  *       500:
  *         description: Server error
  */
 router.get(
-    '/user/:userId',
-    authenticateToken,
-    (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-      },
-      [
-        check('userId')
-          .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
-      ],
-      (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
-        }
-        next();
-      },
-    privateConversationController.getAllConversationsByUserId
+  '/user',
+  authenticateToken,
+  (req, res, next) => {
+      const lang = getLanguageFromHeaders(req) || 'en';
+      req.validationMessages = messages[lang];
+      next();
+  },
+  privateConversationController.getAllConversationsByUserId
 );
 
 /**
@@ -99,6 +83,8 @@ router.get(
  *   delete:
  *     summary: Delete a conversation by ID
  *     tags: [Private Conversations]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: conversationId
@@ -142,6 +128,8 @@ router.delete(
  *   put:
  *     summary: Add a participant to a conversation
  *     tags: [Private Conversations]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: conversationId
