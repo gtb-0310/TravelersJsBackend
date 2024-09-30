@@ -20,6 +20,8 @@ const messages = require('../utils/messages');
  *     summary: Retrieve a list of all trip types
  *     description: Fetch all available trip types from the database.
  *     tags: [TripTypes]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of all trip types.
@@ -52,6 +54,8 @@ router.get('/', authenticateToken, tripTypeController.getAllTripTypes);
  *     summary: Retrieve a specific trip type by ID
  *     description: Fetch a specific trip type by providing its ID.
  *     tags: [TripTypes]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

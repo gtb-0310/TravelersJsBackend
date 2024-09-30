@@ -137,7 +137,9 @@ const messages = {
         FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "You need to be the author of the message or the group administrator.",
         CONVERSATION_NOT_FOUND: "Conversation not found.",
         USER_NOT_IN_CONVERSATION: "You need to be member of the conversation.",
-        LAST_MESSAGE_MARKED_AS_READ: "Last message marked as read."
+        LAST_MESSAGE_MARKED_AS_READ: "Last message marked as read.",
+        USER_REPORTED_WITH_SUCCESS: "User reported with succes!",
+        NOT_MODERATOR_DENIED_ACCESS: "You need to be a moderator."
 
     },
     fr: {
@@ -273,7 +275,9 @@ const messages = {
         FORBIDDEN_NOT_MESSAGE_AUTHOR_OR_ADMIN: "Vous devez être l'auteur du message ou l'administrateur du groupe.",
         CONVERSATION_NOT_FOUND: "Aucune conversation trouvée.",
         USER_NOT_IN_CONVERSATION: "Vous devez être membre de la conversation.",
-        LAST_MESSAGE_MARKED_AS_READ: "Dernier message de la conversation marqué comme lu."
+        LAST_MESSAGE_MARKED_AS_READ: "Dernier message de la conversation marqué comme lu.",
+        USER_REPORTED_WITH_SUCCESS: "Utilisateur signalé avec succès!",
+        NOT_MODERATOR_DENIED_ACCESS: "Cette action requiert les droits administrateurs."
     },
 };
 

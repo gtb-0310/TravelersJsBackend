@@ -2,6 +2,7 @@ const express = require('express');
 const { check, validationResult } = require('express-validator');
 const router = express.Router();
 const reportedUserController = require('../controllers/reportedUser.controller');
+const checkDatabaseAdministrator = require('../middlewares/checkDatabaseAdministrator');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
@@ -19,6 +20,8 @@ const messages = require('../utils/messages');
  *   get:
  *     summary: Retrieve all reports
  *     tags: [Reported Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of all reports
@@ -30,6 +33,7 @@ const messages = require('../utils/messages');
 router.get(
     '/',
     authenticateToken,
+    checkDatabaseAdministrator,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
@@ -44,6 +48,8 @@ router.get(
  *   get:
  *     summary: Retrieve a specific report by ID
  *     tags: [Reported Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: reportingId
@@ -62,6 +68,7 @@ router.get(
 router.get(
     '/:reportingId',
     authenticateToken,
+    checkDatabaseAdministrator,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
@@ -86,6 +93,8 @@ router.get(
  *   post:
  *     summary: Create a new report
  *     tags: [Reported Users]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -93,13 +102,9 @@ router.get(
  *           schema:
  *             type: object
  *             required:
- *               - reportingUserId
  *               - reportedUserId
  *               - reason
  *             properties:
- *               reportingUserId:
- *                 type: string
- *                 description: The ID of the user making the report
  *               reportedUserId:
  *                 type: string
  *                 description: The ID of the user being reported
@@ -123,7 +128,6 @@ router.post(
         next();
     },
     [
-        check('reportingUserId').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
         check('reportedUserId').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
         check('reason').notEmpty().withMessage((value, { req }) => req.validationMessages.REASON_REQUIRED)
     ],
@@ -139,10 +143,12 @@ router.post(
 
 /**
  * @swagger
- * /reported-users/{id}:
+ * /reported-users/delete/{id}:
  *   delete:
  *     summary: Delete a report by ID
  *     tags: [Reported Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -159,7 +165,7 @@ router.post(
  *         description: Server error
  */
 router.delete(
-    '/:id',
+    '/delete/:id',
     authenticateToken,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';

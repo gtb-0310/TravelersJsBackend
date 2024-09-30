@@ -5,6 +5,7 @@ const privateConversationController = require('../controllers/privateConversatio
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
+const checkIfConversationMember = require('../middlewares/checkIfConversationMember');
 
 /**
  * @swagger
@@ -103,6 +104,7 @@ router.get(
 router.delete(
     '/:conversationId',
     authenticateToken,
+    checkIfConversationMember,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
@@ -160,6 +162,7 @@ router.delete(
 router.put(
     '/:conversationId/add-participant',
     authenticateToken,
+    checkIfConversationMember,
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
       req.validationMessages = messages[lang];

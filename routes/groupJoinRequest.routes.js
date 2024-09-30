@@ -133,7 +133,7 @@ router.get('/user/me/join-requests', authenticateToken, groupController.getJoinR
  *     summary: L'utilisateur envoie une requête pour rejoindre un groupe
  *     tags: [Group join requests]
  *     security:
- *       - bearerAuth: []  # Le token JWT est requis
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: groupId

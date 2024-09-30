@@ -20,6 +20,8 @@ const checkOwnerProfil = require('../middlewares/checkOwnerProfil');
  *   get:
  *     summary: Récupère un utilisateur par son ID
  *     tags: [Utilisateurs]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -270,6 +272,8 @@ router.put(
  *   put:
  *     summary: Change le mot de passe d'un utilisateur
  *     tags: [Utilisateurs]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -469,6 +473,8 @@ router.post(
  *   delete:
  *     summary: Supprime le profil d'un utilisateur et ses données associées
  *     tags: [Utilisateurs]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

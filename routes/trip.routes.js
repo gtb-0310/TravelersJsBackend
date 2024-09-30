@@ -16,7 +16,7 @@ const messages = require('../utils/messages');
  *     summary: Récupère une liste de trips avec filtres
  *     tags: [Trips]
  *     security:
- *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: startDate
@@ -199,6 +199,8 @@ router.get(
  *   get:
  *     summary: Récupère les détails d'un trip par son ID
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -517,7 +519,7 @@ router.post(
  *     summary: Met à jour les détails d'un trip existant
  *     tags: [Trips]
  *     security:
- *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -704,7 +706,7 @@ router.put(
  *     summary: Supprime un trip existant ainsi que le groupe associé
  *     tags: [Trips]
  *     security:
- *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

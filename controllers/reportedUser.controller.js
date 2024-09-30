@@ -27,7 +27,7 @@ exports.getAllReports = async (req, res) => {
 
 exports.getReportingById = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const reportingId = req.params.id;
+    const reportingId = req.params.reportingId;
 
     try {
         const reporting = await ReportedUser.findById(reportingId)
@@ -53,7 +53,8 @@ exports.getReportingById = async (req, res) => {
  */
 exports.createReport = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { reportingUserId, reportedUserId, reason } = req.body;
+    const reportingUserId = req.user.id;
+    const { reportedUserId, reason } = req.body;
 
     try {
         const existingReport = await ReportedUser.findOne({
@@ -72,7 +73,7 @@ exports.createReport = async (req, res) => {
         });
 
         const savedReport = await newReport.save();
-        res.status(201).json(savedReport);
+        res.status(201).json({message: messages[lang].USER_REPORTED_WITH_SUCCESS });
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }

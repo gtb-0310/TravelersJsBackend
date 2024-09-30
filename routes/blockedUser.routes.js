@@ -30,16 +30,32 @@ const messages = require('../utils/messages');
  *               items:
  *                 type: object
  *                 properties:
- *                   blockingUserId:
- *                     type: string
- *                     description: ID de l'utilisateur qui bloque
  *                   blockedUserId:
  *                     type: string
  *                     description: ID de l'utilisateur bloqué
  *       404:
  *         description: Utilisateur bloquant non trouvé
  */
-router.get('/', authenticateToken, blockedUserController.getBlockedUserById);
+router.get(
+  '/',
+  authenticateToken,
+  [
+    (req, res, next) => {
+      const lang = getLanguageFromHeaders(req) || 'en';
+      req.validationMessages = messages[lang];
+      next();
+    },
+    check('blockedUserId')
+      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKED_USER_ID),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  blockedUserController.getBlockedUserById);
 
 /**
  * @swagger
@@ -48,7 +64,7 @@ router.get('/', authenticateToken, blockedUserController.getBlockedUserById);
  *     summary: Bloque un utilisateur
  *     tags: [Blocked users]
  *     security:
- *       - bearerAuth: []  # Utilisation du token JWT
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -106,6 +122,8 @@ router.post(
  *   delete:
  *     summary: Débloque un utilisateur
  *     tags: [Blocked users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: blockedUserDocId

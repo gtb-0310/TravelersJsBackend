@@ -124,7 +124,6 @@ exports.markLastMessageAsRead = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
 
     try {
-        console.log("Identifiant de la conversation : ", conversationId);
         const conversation = await PrivateConversation.findById(conversationId);
         if (!conversation) {
             return res.status(404).json({ message: messages[lang].PRIVATE_CONVERS_NOT_FOUND });

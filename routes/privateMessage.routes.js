@@ -217,7 +217,7 @@ router.put(
 
 /**
  * @swagger
- * /private-messages/{conversationId}:
+ * /private-messages/conversation/{conversationId}:
  *   put:
  *     summary: Mark the last message in a conversation as read
  *     tags: [Private Messages]
@@ -241,6 +241,7 @@ router.put(
 router.put(
     '/conversation/:conversationId',
     authenticateToken,
+    checkIfConversationMember,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];

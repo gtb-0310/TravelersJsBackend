@@ -22,6 +22,8 @@ const messages = require('../utils/messages');
  *   get:
  *     summary: Récupère un groupe par son ID
  *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -151,13 +153,14 @@ router.put(
 );
 
 
-
 /**
  * @swagger
  * /groups/{groupId}/users/{userId}:
  *   delete:
  *     summary: Supprime un utilisateur d'un groupe (ADMINISTRATEUR ou utilisateur quittant le groupe)
  *     tags: [Groups]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: groupId

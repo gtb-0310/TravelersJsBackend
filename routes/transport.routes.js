@@ -20,6 +20,8 @@ const messages = require('../utils/messages');
  *     summary: Retrieve a list of all means of transport
  *     description: Fetch all available means of transport from the database.
  *     tags: [Transports]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of all transports.
@@ -52,6 +54,8 @@ router.get('/', authenticateToken, transportController.getAllTransports);
  *     summary: Retrieve specific means of transport by ID(s)
  *     description: Fetch one or multiple means of transport by providing their ID(s). Multiple IDs can be provided as a comma-separated string.
  *     tags: [Transports]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
