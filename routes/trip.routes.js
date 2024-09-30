@@ -208,8 +208,6 @@ router.get(
  *         description: ID du trip à récupérer
  *         schema:
  *           type: string
- *     security:
- *       - bearerAuth: []  # Si vous utilisez JWT ou un autre mécanisme d'authentification par jeton
  *     responses:
  *       200:
  *         description: Détails du trip récupérés avec succès
