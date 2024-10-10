@@ -7,6 +7,7 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
 const checkOwnerProfil = require('../middlewares/checkOwnerProfil');
+const checkOwnerToModifProfil = require('../middlewares/checkOwnerToModifProfil');
 
 /**
  * @swagger
@@ -137,19 +138,12 @@ router.post(
 
 /**
  * @swagger
- * /users/{id}:
+ * /users:
  *   put:
- *     summary: Met à jour les informations d'un utilisateur par son ID
+ *     summary: Met à jour les informations de l'utilisateur connecté
  *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID de l'utilisateur à mettre à jour
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -166,22 +160,26 @@ router.post(
  *             properties:
  *               firstName:
  *                 type: string
+ *                 description: Prénom de l'utilisateur
  *               lastName:
  *                 type: string
+ *                 description: Nom de famille de l'utilisateur
  *               profilePictureUrl:
  *                 type: string
+ *                 description: URL de l'image de profil
  *               description:
  *                 type: string
+ *                 description: Une description de l'utilisateur
  *               languages:
  *                 type: array
  *                 items:
  *                   type: string
- *                   description: ObjectId de la langue
+ *                   description: ObjectId des langues que l'utilisateur parle
  *               interests:
  *                 type: array
  *                 items:
  *                   type: string
- *                   description: ObjectId de l'intérêt
+ *                   description: ObjectId des intérêts de l'utilisateur
  *     responses:
  *       200:
  *         description: Informations de l'utilisateur mises à jour avec succès
@@ -192,6 +190,7 @@ router.post(
  *               properties:
  *                 _id:
  *                   type: string
+ *                   description: ID de l'utilisateur
  *                 firstName:
  *                   type: string
  *                 lastName:
@@ -216,32 +215,30 @@ router.post(
  *         description: Erreur du serveur
  */
 router.put(
-    '/:id',
+    '/',
     authenticateToken,
-    checkOwnerProfil,
+    checkOwnerToModifProfil,
     [
         (req, res, next) => {
             const lang = getLanguageFromHeaders(req) || 'en';
             req.validationMessages = messages[lang];
             next();
         },
-        check('id')
-        .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
         check('firstName')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_FIRST_NAME)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_FIRST_NAME)
-            .trim().escape(),
+            .trim(),
         check('lastName')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_LAST_NAME)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_LAST_NAME)
-            .trim().escape(),
+            .trim(),
         check('profilePictureUrl')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_PROFILE_PICTURE_URL)
             .isURL().withMessage((value, { req }) => req.validationMessages.INVALID_PROFILE_PICTURE_URL),
         check('description')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_DESCRIPTION)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_DESCRIPTION)
-            .trim().escape(),
+            .trim(),
         check('languages')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_LANGUAGES)
             .isArray().withMessage((value, { req }) => req.validationMessages.INVALID_LANGUAGES)
@@ -262,25 +259,19 @@ router.put(
         }
         next();
     },
-    userController.updateUserById
+    userController.updateUser
 );
+
 
 
 /**
  * @swagger
- * /users/{id}/change-password:
+ * /users/change-password:
  *   put:
- *     summary: Change le mot de passe d'un utilisateur
+ *     summary: Change le mot de passe de l'utilisateur connecté
  *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID de l'utilisateur dont le mot de passe doit être changé
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -290,6 +281,7 @@ router.put(
  *             required:
  *               - currentPassword
  *               - newPassword
+ *               - confirmNewPassword
  *             properties:
  *               currentPassword:
  *                 type: string
@@ -297,6 +289,9 @@ router.put(
  *               newPassword:
  *                 type: string
  *                 description: Le nouveau mot de passe de l'utilisateur
+ *               confirmNewPassword:
+ *                 type: string
+ *                 description: Confirmation du nouveau mot de passe
  *     responses:
  *       200:
  *         description: Mot de passe mis à jour avec succès
@@ -316,9 +311,9 @@ router.put(
  *         description: Erreur du serveur
  */
 router.put(
-    '/:id/change-password',
+    '/change-password',
     authenticateToken,
-    checkOwnerProfil,
+    checkOwnerToModifProfil,
     [
         (req, res, next) => {
             const lang = getLanguageFromHeaders(req) || 'en';
@@ -330,6 +325,9 @@ router.put(
             .isLength({ min: 5 }).withMessage((value, { req }) => req.validationMessages.PASSWORD_TOO_SHORT),
         check('newPassword')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_NEW_PASSWORD)
+            .isLength({ min: 5 }).withMessage((value, { req }) => req.validationMessages.PASSWORD_TOO_SHORT),
+        check('confirmNewPassword')
+            .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_CONFIRM_PASSWORD)
             .isLength({ min: 5 }).withMessage((value, { req }) => req.validationMessages.PASSWORD_TOO_SHORT),
     ],
     (req, res, next) => {
@@ -469,19 +467,12 @@ router.post(
 
 /**
  * @swagger
- * /users/{id}:
+ * /users:
  *   delete:
  *     summary: Supprime le profil d'un utilisateur et ses données associées
  *     tags: [Utilisateurs]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: L'ID de l'utilisateur à supprimer
  *     responses:
  *       200:
  *         description: Profil utilisateur supprimé avec succès
@@ -501,18 +492,14 @@ router.post(
  *         description: Erreur du serveur
  */
 router.delete(
-    '/:id',
+    '/',
     authenticateToken,
-    checkOwnerProfil,
-    [
-        (req, res, next) => {
-            const lang = getLanguageFromHeaders(req) || 'en';
-            req.validationMessages = messages[lang];
-            next();
-        },
-        check('id')
-            .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID)
-    ],
+    checkOwnerToModifProfil,
+    (req, res, next) => {
+        const lang = getLanguageFromHeaders(req) || 'en';
+        req.validationMessages = messages[lang];
+        next();
+    },
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -520,7 +507,7 @@ router.delete(
         }
         next();
     },
-    userController.deleteUserProfilById
+    userController.deleteUserProfil
 );
 
 

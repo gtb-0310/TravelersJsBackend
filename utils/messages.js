@@ -139,7 +139,11 @@ const messages = {
         USER_NOT_IN_CONVERSATION: "You need to be member of the conversation.",
         LAST_MESSAGE_MARKED_AS_READ: "Last message marked as read.",
         USER_REPORTED_WITH_SUCCESS: "User reported with succes!",
-        NOT_MODERATOR_DENIED_ACCESS: "You need to be a moderator."
+        NOT_MODERATOR_DENIED_ACCESS: "You need to be a moderator.",
+        COUNTRIES_NOT_FOUND: "Countries not found.",
+        REQUIRED_CONFIRM_PASSWORD: "Confirm password is required.",
+        PASSWORD_UPDATED_WITH_SUCCESS: "Password updated with succes!",
+        WRONG_CURRENT_PASSWORD: "Wrong current password."
 
     },
     fr: {
@@ -277,7 +281,11 @@ const messages = {
         USER_NOT_IN_CONVERSATION: "Vous devez être membre de la conversation.",
         LAST_MESSAGE_MARKED_AS_READ: "Dernier message de la conversation marqué comme lu.",
         USER_REPORTED_WITH_SUCCESS: "Utilisateur signalé avec succès!",
-        NOT_MODERATOR_DENIED_ACCESS: "Cette action requiert les droits administrateurs."
+        NOT_MODERATOR_DENIED_ACCESS: "Cette action requiert les droits administrateurs.",
+        COUNTRIES_NOT_FOUND: "Aucun pays trouvé.",
+        REQUIRED_CONFIRM_PASSWORD: "Le mot de passe de confirmation est requis.",
+        PASSWORD_UPDATED_WITH_SUCCESS: "Mot de passe mis à jour avec succès!",
+        WRONG_CURRENT_PASSWORD: "Le mot de passe actuel est incorrect."
     },
 };
 

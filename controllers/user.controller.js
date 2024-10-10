@@ -130,7 +130,7 @@ exports.createUser = async (req, res) => {
  * PUT
  * ---------------------------------------
  */
-exports.updateUserById = async (req, res) => {
+exports.updateUser = async (req, res) => {
     const {
         firstName,
         lastName,
@@ -141,7 +141,8 @@ exports.updateUserById = async (req, res) => {
     } = req.body;
 
     const lang = getLanguageFromHeaders(req) || 'en';
-    const userId = req.params.id;
+    const userId = req.user.id;
+
 
     try {
         const userToUpdate = await User.findById(userId);
@@ -181,11 +182,16 @@ exports.updateUserById = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
     const lang = getLanguageFromHeaders(req) || 'en';
-    const userId = req.params.id;
+    const userId = req.user.id;
 
     try {
+
+        if( newPassword!== confirmNewPassword ){
+            return res.status(400).json({ message: messages[lang].PASSWORDS_DO_NOT_MATCH });
+        }
+
         const user = await User.findById(userId);
 
         if (!user) {
@@ -194,17 +200,18 @@ exports.changePassword = async (req, res) => {
 
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: messages[lang].INVALID_CURRENT_PASSWORD });
+            return res.status(400).json({ message: messages[lang].WRONG_CURRENT_PASSWORD });
         }
+
 
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(newPassword, salt);
 
         await user.save();
 
-        res.status(200).json({ message: messages[lang].PASSWORD_UPDATED_SUCCESS });
+        res.status(200).json({ message: messages[lang].PASSWORD_UPDATED_WITH_SUCCESS });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 
@@ -232,16 +239,17 @@ exports.requestPasswordReset = async (req, res) => {
 
         
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'sandbox.smtp.mailtrap.io',
+            port: 2525,
             auth: {
-                user: 'your-email@gmail.com',
-                pass: 'your-email-password'
+                user: process.env.MAILTRAP_USER,
+                pass: process.env.MAILTRAP_PASS
             }
         });
 
         
         const mailOptions = {
-            from: 'your-email@gmail.com',
+            from: 'noreply@travelers.com',
             to: user.email,
             subject: messages[lang].RESET_PASSWORD,
             text: `${messages[lang].RESET_PASSWORD_TEXT} ${resetUrl}`,
@@ -280,6 +288,8 @@ exports.resetPassword = async (req, res) => {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
 
+        user.refreshToken = undefined;
+
         await user.save();
 
         res.status(200).json({ message: messages[lang].PASSWORD_RESET_WITH_SUCCESS });
@@ -288,15 +298,14 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-
 /***
  * ---------------------------------------
  * DELETE
  * ---------------------------------------
  */
-exports.deleteUserProfilById = async (req, res) => {
+exports.deleteUserProfil = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const userId = req.params.id;
+    const userId = req.user.id;
 
     try {
         const userProfilToDelete = await User.findByIdAndDelete(userId);

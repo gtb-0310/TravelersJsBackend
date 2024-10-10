@@ -5,6 +5,7 @@ const countryController = require('../controllers/country.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
+const mongoose = require('mongoose');
 
 /**
  * @swagger

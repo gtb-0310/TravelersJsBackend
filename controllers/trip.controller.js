@@ -105,13 +105,22 @@ exports.getTripById = async (req, res) => {
     try {
         const trip = await Trip.findById(tripId)
             .populate({ path: 'userId', select: 'firstName lastName' })
-            .populate({ path: 'transport', select: 'typeTransport' })
-            .populate({ path: 'destination', select: 'name' })
-            .populate({ path: 'tripType', select: 'name' })
+            .populate({ 
+                path: 'transport',
+                select: `typeTransport.${lang}`
+            })
+            .populate({
+                path: 'destination',
+                select: `name.${lang}`
+            })
+            .populate({
+                path: 'tripType',
+                select: `name.${lang}` 
+            })
             .populate({
                 path: 'groupId',
                 populate: [
-                    { path: 'languages', select: 'name' },
+                    { path: 'languages', select: `name.${lang}` },
                     { path: 'members', select: 'firstName lastName' }
                 ]
             });
@@ -120,13 +129,13 @@ exports.getTripById = async (req, res) => {
             return res.status(404).json({ message: messages[lang].TRIP_NOT_FOUND });
         }
 
-        
         res.status(200).json(trip);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 /***
  * ---------------------------------------

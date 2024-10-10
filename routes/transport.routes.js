@@ -4,7 +4,8 @@ const router = express.Router();
 const transportController = require('../controllers/transport.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
-const messages = require('../utils/messages'); 
+const messages = require('../utils/messages');
+const mongoose = require('mongoose'); 
 
 /**
  * @swagger

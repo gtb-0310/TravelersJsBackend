@@ -11,7 +11,7 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
 exports.getAllInterest = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     try {
-        const allInterests = await Interest.find()
+        const allInterests = await Interest.find({}, { [`name.${lang}`]: 1 });
         if(allInterests.length === 0) {
             return res.status(404).json({ message: messages[lang].INTEREST_NOT_FOUND });
         }
@@ -26,7 +26,10 @@ exports.getInterestsByIds = async (req, res) => {
     const interestIds = req.params.interestIds.split(',');
 
     try {
-        const interests = await Interest.find({ _id: { $in: interestIds } });
+        const interests = await Interest.find(
+            { _id: { $in: interestIds } },
+            { [`name.${lang}`]: 1 }
+        );
 
         if (interests.length === 0) {
             return res.status(404).json({ message: messages[lang].INTERESTS_NOT_FOUND });

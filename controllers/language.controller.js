@@ -7,11 +7,11 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
  * GET
  * ---------------------------------------
  */
-
 exports.getAllLanguages = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     try {
-        const allLanguages = await Language.find();
+        const allLanguages = await Language.find({}, { [`name.${lang}`]: 1 });
+
         if (allLanguages.length === 0) {
             return res.status(404).json({ message: messages[lang].LANGUAGES_NOT_FOUND });
         }
@@ -21,13 +21,15 @@ exports.getAllLanguages = async (req, res) => {
     }
 };
 
-
 exports.getLanguagesByIds = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     const languageIds = req.params.languageIds.split(',');
 
     try {
-        const languages = await Language.find({ _id: { $in: languageIds } });
+        const languages = await Language.find(
+            { _id: { $in: languageIds } },
+            { [`name.${lang}`]: 1 }
+        );
 
         if (languages.length === 0) {
             return res.status(404).json({ message: messages[lang].LANGUAGES_NOT_FOUND });
