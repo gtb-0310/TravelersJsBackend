@@ -5,6 +5,8 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const blockedUserController = require('../controllers/blockedUser.controller');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
+const isBlockingRequestFromConnectedUser = require('../middlewares/isBlockingRequestFromConnectedUser');
+const isAlreadyBlocked = require('../middlewares/isAlreadyBlocked');
 
 /**
  * @swagger
@@ -16,7 +18,7 @@ const messages = require('../utils/messages');
  * @swagger
  * /blocked-users:
  *   get:
- *     summary: Récupère les utilisateurs bloqués par un utilisateur spécifique
+ *     summary: Récupère la liste des utilisateurs bloqués par l'utilisateur authentifié
  *     tags: [Blocked users]
  *     security:
  *       - bearerAuth: []
@@ -39,23 +41,7 @@ const messages = require('../utils/messages');
 router.get(
   '/',
   authenticateToken,
-  [
-    (req, res, next) => {
-      const lang = getLanguageFromHeaders(req) || 'en';
-      req.validationMessages = messages[lang];
-      next();
-    },
-    check('blockedUserId')
-      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_BLOCKED_USER_ID),
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-  blockedUserController.getBlockedUserById);
+  blockedUserController.getBlockedUserList);
 
 /**
  * @swagger
@@ -83,9 +69,6 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
- *                 blockingUserId:
- *                   type: string
- *                   description: ID de l'utilisateur qui bloque (récupéré via JWT)
  *                 blockedUserId:
  *                   type: string
  *                   description: ID de l'utilisateur bloqué
@@ -97,6 +80,7 @@ router.get(
 router.post(
     '/',
     authenticateToken,
+    isAlreadyBlocked,
     [
       (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
@@ -141,6 +125,8 @@ router.post(
  */
 router.delete(
     '/:blockedUserDocId',
+    authenticateToken,
+    isBlockingRequestFromConnectedUser,
     [
       (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';

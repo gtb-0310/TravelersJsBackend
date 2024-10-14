@@ -26,7 +26,7 @@ exports.getUserById = async (req, res) => {
     const userId = req.params.id;
 
     try {
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select('firstName lastName birthDate description languages interests');
 
         if(!user){
             return res.status(404).json({ message: messages[lang].USER_ID_NOT_FOUND });
@@ -303,6 +303,68 @@ exports.resetPassword = async (req, res) => {
  * DELETE
  * ---------------------------------------
  */
+// exports.deleteUserProfil = async (req, res) => {
+//     const lang = getLanguageFromHeaders(req) || 'en';
+//     const userId = req.user.id;
+
+//     try {
+//         const userProfilToDelete = await User.findByIdAndDelete(userId);
+
+//         if (!userProfilToDelete) {
+//             return res.status(404).json({ message: messages[lang].USER_ID_NOT_FOUND });
+//         }
+
+//         const groups = await Group.find({ members: userId });
+
+//         for (const group of groups) {
+//             if (group.administrator.toString() === userId) {
+//                 if (group.members.length === 1) {
+//                     await Trip.findOneAndDelete({ groupId: group._id });
+//                     await Group.findByIdAndDelete(group._id);
+//                     continue;
+//                 } else {
+//                     group.administrator = group.members[0];
+//                     await Trip.updateOne({ groupId: group._id }, { userId: group.administrator });
+//                 }
+//             }
+
+
+//             group.members.pull(userId);
+
+//             const remainingMembers = await User.find({ _id: { $in: group.members } });
+//             const updatedLanguages = [...new Set(remainingMembers.flatMap(member => member.languages.map(lang => lang.toString())))];
+
+//             group.languages = updatedLanguages;
+//             await group.save();
+
+//         }
+
+
+//         const conversations = await PrivateConversation.find({ participants: userId });
+
+//         for (const conversation of conversations) {
+//             conversation.participants.pull(userId);
+
+//             if (conversation.participants.length === 0) {
+//                 await PrivateConversation.findByIdAndDelete(conversation._id);
+//             } else {
+//                 await conversation.save();
+//             }
+//         }
+
+//         await PrivateMessage.deleteMany({ senderId: userId });
+//         await BlockedUser.deleteMany({ blockingUserId: userId });
+//         await GroupJoinRequest.deleteMany({ userId: userId });
+//         await GroupMessage.deleteMany({ senderId: userId });
+//         await ReportedUser.deleteMany({ reportedUserId: userId });
+
+//         res.json({ message: messages[lang].PROFIL_DELETE_WITH_SUCCESS });
+
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: messages[lang].SERVER_ERROR });
+//     }
+// };
 exports.deleteUserProfil = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     const userId = req.user.id;
@@ -323,36 +385,65 @@ exports.deleteUserProfil = async (req, res) => {
                     await Group.findByIdAndDelete(group._id);
                     continue;
                 } else {
-                    group.administrator = group.members[0];
-                    await Trip.updateOne({ groupId: group._id }, { userId: group.administrator });
+                    const newAdmin = group.members.find(member => member.toString() !== userId);
+                    group.administrator = newAdmin;
+                    await Trip.updateOne({ groupId: group._id }, { userId: newAdmin });
                 }
             }
-
 
             group.members.pull(userId);
 
             const remainingMembers = await User.find({ _id: { $in: group.members } });
             const updatedLanguages = [...new Set(remainingMembers.flatMap(member => member.languages.map(lang => lang.toString())))];
-
             group.languages = updatedLanguages;
-            await group.save();
 
+            await group.save();
         }
 
-
+        // Gestion des conversations privées
         const conversations = await PrivateConversation.find({ participants: userId });
 
         for (const conversation of conversations) {
-            conversation.participants.pull(userId);
+            // Supprimer les messages de l'utilisateur du tableau `messages`
+            const userMessages = await PrivateMessage.find({ senderId: userId });
+            const messageIds = userMessages.map(msg => msg._id); // Récupère les IDs des messages à supprimer
 
-            if (conversation.participants.length === 0) {
+            conversation.messages = conversation.messages.filter(messageId => !messageIds.includes(messageId));
+
+            // Si le `lastMessage` a été envoyé par l'utilisateur, on cherche le dernier message valide
+            if (conversation.lastMessage && conversation.lastMessage.senderId.toString() === userId) {
+                // On cherche le dernier message valide envoyé par un autre utilisateur
+                const lastValidMessage = await PrivateMessage.findOne({
+                    _id: { $in: conversation.messages }, // Parmi les messages encore valides
+                    senderId: { $ne: userId } // Un message envoyé par un autre utilisateur
+                }).sort({ timestamp: -1 }); // Trier par date décroissante pour avoir le dernier message
+
+                if (lastValidMessage) {
+                    // Si on trouve un message valide, on met à jour `lastMessage`
+                    conversation.lastMessage = {
+                        senderId: lastValidMessage.senderId,
+                        content: lastValidMessage.content,
+                        timestamp: lastValidMessage.timestamp
+                    };
+                } else {
+                    // Si aucun message valide n'est trouvé, on supprime le champ lastMessage
+                    conversation.lastMessage = null;
+                }
+            }
+
+            // Gérer la suppression de l'utilisateur de la conversation
+            conversation.participants.pull(userId);
+            if (conversation.participants.length <= 1) {
                 await PrivateConversation.findByIdAndDelete(conversation._id);
             } else {
                 await conversation.save();
             }
         }
 
+        // Supprimer les messages de PrivateMessage
         await PrivateMessage.deleteMany({ senderId: userId });
+
+        // Supprimer d'autres données associées
         await BlockedUser.deleteMany({ blockingUserId: userId });
         await GroupJoinRequest.deleteMany({ userId: userId });
         await GroupMessage.deleteMany({ senderId: userId });
@@ -365,5 +456,6 @@ exports.deleteUserProfil = async (req, res) => {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 

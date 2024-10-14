@@ -28,12 +28,13 @@ exports.getConversationByGroupId = async (req, res) => {
 
 exports.getGroupMessageById = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const messageId = req.params.id;
+    const messageId = req.params.messageId;  
+    const groupId = req.params.groupId;
 
-    try{
-        const groupMessage = await GroupMessage.findById(messageId);
+    try {
+        const groupMessage = await GroupMessage.findOne({ _id: messageId, groupId: groupId });
 
-        if(!groupMessage) {
+        if (!groupMessage) {
             return res.status(404).json({ message: messages[lang].MSG_NOT_FOUND });
         }
 
@@ -42,6 +43,7 @@ exports.getGroupMessageById = async (req, res) => {
         return res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 /***
  * ---------------------------------------

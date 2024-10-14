@@ -7,6 +7,7 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const checkTripAdministrator = require('../middlewares/checkTripAdministrator');
 const messages = require('../utils/messages');
+const checkIfUserIsTripOwner = require('../middlewares/checkIfUserIsTripOwner');
 
 
 /**
@@ -323,6 +324,122 @@ router.get(
     next();
   },
   tripController.getTripById
+);
+
+
+/**
+ * @swagger
+ * /trips/user/tripOwner:
+ *   get:
+ *     summary: Récupère tous les trips de l'utilisateur authentifié
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Trips récupérés avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: ID du trip
+ *                 title:
+ *                   type: string
+ *                   description: Titre du trip
+ *                 startDate:
+ *                   type: string
+ *                   format: date
+ *                   description: Date de début du trip
+ *                 endDate:
+ *                   type: string
+ *                   format: date
+ *                   description: Date de fin du trip
+ *                 budget:
+ *                   type: number
+ *                   description: Budget du trip
+ *                 userId:
+ *                   type: object
+ *                   properties:
+ *                     firstName:
+ *                       type: string
+ *                     lastName:
+ *                       type: string
+ *                   description: Informations sur l'utilisateur qui a créé le trip
+ *                 transport:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       typeTransport:
+ *                         type: string
+ *                   description: Liste des moyens de transport associés au trip
+ *                 destination:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                   description: Nom de la destination du trip
+ *                 tripType:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                   description: Type de trip
+ *                 groupId:
+ *                   type: object
+ *                   properties:
+ *                     languages:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                       description: Liste des langues parlées par les membres du groupe
+ *                     members:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           firstName:
+ *                             type: string
+ *                           lastName:
+ *                             type: string
+ *                       description: Liste des membres du groupe associés au trip
+ *       404:
+ *         description: Aucun trip trouvé pour cet utilisateur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Aucun trip trouvé pour cet utilisateur
+ *       500:
+ *         description: Erreur interne du serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Une erreur interne est survenue
+ */
+router.get(
+  '/user/tripOwner',
+  authenticateToken,
+  checkIfUserIsTripOwner, 
+  (req, res, next) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    req.validationMessages = messages[lang];
+    next();
+  },
+  tripController.getTripByOwnerId
 );
 
 /**

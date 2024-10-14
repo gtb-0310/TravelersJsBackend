@@ -8,6 +8,7 @@ const validationMessages = require('../utils/messages');
 const checkIfUserIsGroupMember = require('../middlewares/checkIfUserIsGroupMember');
 const checkMessageGroupSender = require('../middlewares/checkMessageGroupSender');
 const checkMessageSenderOrGroupAdmin = require('../middlewares/checkMessageSenderOrGroupAdmin');
+const messages = require('../utils/messages');
 
 /**
  * @swagger
@@ -92,7 +93,7 @@ router.get(
 
 /**
  * @swagger
- * /group-messages/message/{id}:
+ * /group-messages/{groupId}/message/{messageId}:
  *   get:
  *     summary: Get a specific message by ID
  *     tags: [Group Messages]
@@ -100,7 +101,13 @@ router.get(
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: groupId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the group
+ *       - in: path
+ *         name: messageId
  *         required: true
  *         schema:
  *           type: string
@@ -137,15 +144,18 @@ router.get(
  *         description: Server error
  */
 router.get(
-  '/message/:id',
+  '/:groupId/message/:messageId',
   authenticateToken,
+  checkIfUserIsGroupMember,
   [
     (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-      },
-    check('id')
+      const lang = getLanguageFromHeaders(req) || 'en';
+      req.validationMessages = messages[lang];
+      next();
+    },
+    check('groupId')
+      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
+    check('messageId')
       .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_MSG_ID),
   ],
   (req, res, next) => {
@@ -157,6 +167,7 @@ router.get(
   },
   groupMessageController.getGroupMessageById
 );
+
 
 /**
  * @swagger

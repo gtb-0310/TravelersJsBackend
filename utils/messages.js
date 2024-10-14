@@ -12,7 +12,7 @@ const messages = {
         SERVER_ERROR: "An error occurred on the server. Please try again later.",
         SUCCESS: "The operation was executed with success.",
         CONNECTION_ERROR: "Connection error occured, please retry.",
-        GROUP_NOT_FOUND: "Group not found.",
+        GROUP_NOT_FOUND: "No groups found.",
         NOT_ADMIN_DENIED_ACCESS: "You need to be an administrator.",
         GROUP_AND_MESSAGES_DELETED: "The group and messages associated have been succesfully deleted.",
         USER_REMOVE_FROM_GROUP_SUCCESS: "User remove from group with success!",
@@ -52,7 +52,7 @@ const messages = {
         LANGUAGES_NOT_FOUND: "No language found.",
         PRIVATE_CONVERS_NOT_FOUND: "Private conversation not found.",
         PRIVATE_MSG_NOT_FOUND: "Private message not found.",
-        USER_WITH_ID_NOT_FOUND: "No user with this id has been found.",
+        NO_BLOCKED_USER_FOUND: "Blocked users list is empty.",
         BAD_REQUEST: "Bad request.",
         MESSAGE_DELETED_SUCCESS: "Message deleted with success!",
         INVALID_CONVERS_ID: "Invalid conversation id.",
@@ -143,7 +143,14 @@ const messages = {
         COUNTRIES_NOT_FOUND: "Countries not found.",
         REQUIRED_CONFIRM_PASSWORD: "Confirm password is required.",
         PASSWORD_UPDATED_WITH_SUCCESS: "Password updated with succes!",
-        WRONG_CURRENT_PASSWORD: "Wrong current password."
+        WRONG_CURRENT_PASSWORD: "Wrong current password.",
+        NO_TRIPS_FOUND: "No trips found, please change the filters.",
+        TRIP_OWNER_REQUIRED: "You need to be the trip's owner.",
+        BLOCKING_REQUEST_NOT_FOUND: "Blocking request not found.",
+        NOT_ALLOWED: "You don't have the permission to do that.",
+        BLOCKED_USER_NOT_FOUND: "Element not found, try again later.",
+        USER_ALREADY_BLOCKED: "This user is already blocked."
+        
 
     },
     fr: {
@@ -154,7 +161,7 @@ const messages = {
         SERVER_ERROR: "Une erreur s'est produite sur le serveur. Veuillez réessayer plus tard.",
         SUCCESS: "L'opération a été exécutée avec succès.",
         CONNECTION_ERROR: "Une erreur est survenue pendant la connexion, veuillez réesayer.",
-        GROUP_NOT_FOUND: "Groupe non trouvé",
+        GROUP_NOT_FOUND: "Aucun groupe trouvé.",
         GROUP_AND_MESSAGES_DELETED: "Le groupe et les messages associés ont été correctement supprimés.",
         USER_REMOVE_FROM_GROUP_SUCCESS: "Utilisateur supprimé du groupe avec succès!",
         ERROR_DB_CONNECTION: "Echec de connexion à la base de données, veuillez réessayer",
@@ -193,7 +200,7 @@ const messages = {
         LANGUAGES_NOT_FOUND: "Aucune langue trouvée.",
         PRIVATE_CONVERS_NOT_FOUND: "Conversation de groupe non trouvée.",
         PRIVATE_MSG_NOT_FOUND: "Message non trouvé.",
-        USER_WITH_ID_NOT_FOUND: "Aucun utilisateur avec cet id trouvé.",
+        NO_BLOCKED_USER_FOUND: "La liste des utilisateurs bloqué est vide.",
         BAD_REQUEST: "Mauvaise requête.",
         MESSAGE_DELETED_SUCCESS: "Message supprimé avec succès!",
         INVALID_CONVERS_ID: "L'id de la conversation n'est pas valide.",
@@ -285,7 +292,13 @@ const messages = {
         COUNTRIES_NOT_FOUND: "Aucun pays trouvé.",
         REQUIRED_CONFIRM_PASSWORD: "Le mot de passe de confirmation est requis.",
         PASSWORD_UPDATED_WITH_SUCCESS: "Mot de passe mis à jour avec succès!",
-        WRONG_CURRENT_PASSWORD: "Le mot de passe actuel est incorrect."
+        WRONG_CURRENT_PASSWORD: "Le mot de passe actuel est incorrect.",
+        NO_TRIPS_FOUND: "Aucun trip trouvé, veuillez modifier vos filtres.",
+        TRIP_OWNER_REQUIRED: "Vous devez être le propriétaire du trip.",
+        BLOCKING_REQUEST_NOT_FOUND: "La requête de blocage n'a pas été trouvée.",
+        NOT_ALLOWED: "Vous n'avez pas les permissions requises pour effectuer cette action.",
+        BLOCKED_USER_NOT_FOUND: "Utilisateur bloqué non trouvé. Veuillez réessayer.",
+        USER_ALREADY_BLOCKED: "Cet utilisateur est déjà bloqué."
     },
 };
 

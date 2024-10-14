@@ -80,16 +80,26 @@ exports.getTripsWithFilter = async (req, res) => {
 
         const trips = await Trip.find(filter)
             .select('title budget startDate endDate transport destination groupId')
-            .populate({ path: 'transport', select: 'typeTransport' })
-            .populate({ path: 'destination', select: 'name' })
+            .populate({ 
+                path: 'transport',
+                select: `typeTransport.${lang}`
+            })
+            .populate({ 
+                path: 'destination',
+                select: `name.${lang}` 
+            })
             .populate({
                 path: 'groupId',
                 match: matchLanguages,
                 populate: {
                     path: 'languages',
-                    select: 'name'
+                    select: `name.${lang}`
                 }
             });
+
+            if(!trips || trips.length === 0){
+                return res.status(404).json({ message: messages[lang].NO_TRIPS_FOUND });
+            }
 
         res.status(200).json(trips);
     } catch (error) {
@@ -136,6 +146,23 @@ exports.getTripById = async (req, res) => {
     }
 };
 
+exports.getTripByOwnerId = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const userId = req.user.id;
+
+    try {
+        const trips = await Trip.find({ userId: userId }).select('destination startDate endDate');
+
+        if(!trips || trips.length === 0) {
+            return res.status(404).json({ message: messages[lang].TRIP_NOT_FOUND });
+        }
+
+        res.status(200).json(trips);
+    } catch (err) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+}
+
 
 /***
  * ---------------------------------------
@@ -175,6 +202,7 @@ exports.createTrip = async (req, res) => {
             languages: user.languages,
             trip: savedTrip._id
         });
+
         const savedGroup = await group.save();
 
         
@@ -187,6 +215,7 @@ exports.createTrip = async (req, res) => {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 
 /***

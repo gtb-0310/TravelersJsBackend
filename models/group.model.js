@@ -8,7 +8,6 @@ const groupSchema = new Schema({
     },
     members: [{
         type: mongoose.Schema.Types.ObjectId,
-        unique: true,
         ref: 'User',
         required: true
     }],
@@ -19,7 +18,6 @@ const groupSchema = new Schema({
     },
     languages: [{
         type: mongoose.Schema.Types.ObjectId,
-        unique: true,
         ref: 'Language',
         required: true
     }],

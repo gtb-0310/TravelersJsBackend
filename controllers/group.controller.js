@@ -3,7 +3,7 @@ const Group = require('../models/group.model'),
     GroupMessage = require('../models/groupMessage.model'),
     User = require('../models/user.model'),
     Languages = require('../models/language.model'),
-    GroupJoinRequests = require('../models/groupJoinRequest.model');
+    GroupJoinRequests = require('../models/groupJoinRequest.model'),
     getLanguageFromHeaders = require('../utils/languageUtils'),
     messages = require('../utils/messages');
 
@@ -21,28 +21,35 @@ exports.getGroupById = async (req, res) => {
             .populate('members')
             .populate('administrator')
             .populate('languages');
+        
         if (!group) {
             return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });
         }
         res.json(group);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 
 exports.getGroupsByUserId = async (req, res) => {
     try {
+        const lang = getLanguageFromHeaders(req) || 'en';
         const userId = req.user.id;
 
         const groups = await Group.find({ members: userId })
             .populate('members')
             .populate('administrator')
-            .populate('languages');
+            .populate({
+                path: 'languages',
+                select: `name.${lang}`
+            });
 
+        if (!groups || groups.length === 0) {
+            return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });
+        }
         res.json(groups);
     } catch (err) {
-        console.error('Erreur lors de la récupération des groupes :', err);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 
