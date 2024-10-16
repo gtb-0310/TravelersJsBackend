@@ -5,7 +5,8 @@ const Group = require('../models/group.model'),
     Languages = require('../models/language.model'),
     GroupJoinRequests = require('../models/groupJoinRequest.model'),
     getLanguageFromHeaders = require('../utils/languageUtils'),
-    messages = require('../utils/messages');
+    messages = require('../utils/messages'),
+    GroupConversation = require('../models/groupConversation.model');
 
 
 /***
@@ -82,17 +83,22 @@ exports.dissolveGroupById = async (req, res) => {
         group.languages = [];
 
         const admin = await User.findById(group.administrator);
-
         if (!admin) {
             return res.status(404).json({ message: messages[lang].ADMIN_NOT_FOUND });
         }
 
         group.members.push(admin._id);
-
-        const adminLanguages = admin.languages || [];
-        group.languages = [...new Set(adminLanguages)];
+        group.languages = [...new Set(admin.languages || [])];
 
         await group.save();
+
+        const conversation = await GroupConversation.findOne({ groupId: groupId });
+        if (conversation) {
+            conversation.participants = [admin._id];
+            conversation.messages = [];
+            conversation.lastMessage = {};
+            await conversation.save();
+        }
 
         res.json({ message: messages[lang].GROUP_DISSOLVED_WITH_SUCCESS });
     } catch (err) {

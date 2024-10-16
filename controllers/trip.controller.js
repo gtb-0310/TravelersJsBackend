@@ -3,6 +3,7 @@ const Group = require('../models/group.model');
 const User = require('../models/user.model');
 const GroupMessage = require('../models/groupMessage.model');
 const GroupJoinRequests = require('../models/groupJoinRequest.model');
+const GroupConversation = require('../models/groupConversation.model');
 const mongoose = require('mongoose');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
@@ -176,6 +177,7 @@ exports.createTrip = async (req, res) => {
 
     try {
         const user = await User.findById(userId).select('languages');
+
         if (!user) {
             return res.status(404).json({ message: messages[lang].USER_NOT_FOUND });
         }
@@ -194,7 +196,6 @@ exports.createTrip = async (req, res) => {
         const newTrip = new Trip(newTripData);
         const savedTrip = await newTrip.save();
 
-
         const group = new Group({
             name: title, 
             members: [userId], 
@@ -202,16 +203,25 @@ exports.createTrip = async (req, res) => {
             languages: user.languages,
             trip: savedTrip._id
         });
-
         const savedGroup = await group.save();
 
-        
         savedTrip.groupId = savedGroup._id;
         const updatedTrip = await savedTrip.save();
 
+        const newGroupConv = new GroupConversation({
+            groupId: group._id,
+            participants: [userId],
+            lastMessage: {},
+            messages: []
+        });
+
+
+        const groupConv = await newGroupConv.save();
+
         // Réponse réussie
-        res.status(201).json({ trip: updatedTrip, group: savedGroup });
+        res.status(201).json({ trip: updatedTrip, group: savedGroup, conv: groupConv });
     } catch (err) {
+        console.error("Erreur dans le processus de création de trip :", err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
@@ -283,6 +293,7 @@ exports.deleteTripById = async (req, res) => {
         if (group) {
             await GroupMessage.deleteMany({ groupId: groupId });
             await GroupJoinRequests.deleteMany({ groupId: groupId });
+            await GroupConversation.findOneAndDelete({ groupId: groupId });
         }
 
         res.status(200).json({ message: messages[lang].TRIP_GROUP_AND_RELATIVE_ITEMS });

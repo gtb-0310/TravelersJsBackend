@@ -18,10 +18,16 @@ const groupMessageSchema = new Schema({
     },
     timestamp: {
         type: Date,
+        default: Date.now,
+        required: true
+    },
+    isRead: {
+        type: Boolean,
+        default: false,
         required: true
     }
 }, {
-    timestamp: false
+    timestamp: true
 });
 
 const GroupMessage = mongoose.model('GroupMessage', groupMessageSchema, 'GroupMessages');

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const messages = require('../utils/messages');
 
 const connectToDB = async() => {
     try {

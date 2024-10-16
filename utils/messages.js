@@ -149,7 +149,8 @@ const messages = {
         BLOCKING_REQUEST_NOT_FOUND: "Blocking request not found.",
         NOT_ALLOWED: "You don't have the permission to do that.",
         BLOCKED_USER_NOT_FOUND: "Element not found, try again later.",
-        USER_ALREADY_BLOCKED: "This user is already blocked."
+        USER_ALREADY_BLOCKED: "This user is already blocked.",
+        NO_CONVERSATIONS_GROUP_FOUND: "No group conversation found."
         
 
     },
@@ -198,7 +199,7 @@ const messages = {
         INVALID_REQUEST_ID: "Id de requête incorrect.",
         INTEREST_NOT_FOUND: "Aucun centre d'intérêt trouvé.",
         LANGUAGES_NOT_FOUND: "Aucune langue trouvée.",
-        PRIVATE_CONVERS_NOT_FOUND: "Conversation de groupe non trouvée.",
+        PRIVATE_CONVERS_NOT_FOUND: "Conversation privée non trouvée.",
         PRIVATE_MSG_NOT_FOUND: "Message non trouvé.",
         NO_BLOCKED_USER_FOUND: "La liste des utilisateurs bloqué est vide.",
         BAD_REQUEST: "Mauvaise requête.",
@@ -298,7 +299,8 @@ const messages = {
         BLOCKING_REQUEST_NOT_FOUND: "La requête de blocage n'a pas été trouvée.",
         NOT_ALLOWED: "Vous n'avez pas les permissions requises pour effectuer cette action.",
         BLOCKED_USER_NOT_FOUND: "Utilisateur bloqué non trouvé. Veuillez réessayer.",
-        USER_ALREADY_BLOCKED: "Cet utilisateur est déjà bloqué."
+        USER_ALREADY_BLOCKED: "Cet utilisateur est déjà bloqué.",
+        NO_CONVERSATIONS_GROUP_FOUND: "Pas de conversation de groupe trouvée."
     },
 };
 
