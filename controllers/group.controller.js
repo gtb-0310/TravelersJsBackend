@@ -21,7 +21,10 @@ exports.getGroupById = async (req, res) => {
         const group = await Group.findById(groupId)
             .populate('members')
             .populate('administrator')
-            .populate('languages');
+            .populate({
+                path: 'languages',
+                select: `name.${lang}`
+            });
         
         if (!group) {
             return res.status(404).json({ message: messages[lang].GROUP_NOT_FOUND });

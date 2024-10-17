@@ -2,7 +2,8 @@ const GroupJoinRequest = require('../models/groupJoinRequest.model'),
     Group = require('../models/group.model'),
     User = require('../models/user.model'),
     getLanguageFromHeaders = require('../utils/languageUtils'),
-    messages = require('../utils/messages');
+    messages = require('../utils/messages'),
+    GroupConversation = require('../models/groupConversation.model');
 
 /***
  * ---------------------------------------
@@ -114,6 +115,15 @@ exports.approveGroupJoinRequest = async (req, res) => {
                 languages: { $each: userLanguages }
             }
         });
+
+        const conversation = await GroupConversation.findOne({ groupId: joinRequest.groupId });
+        if (conversation) {
+            await GroupConversation.findByIdAndUpdate(conversation._id, {
+                $addToSet: { participants: joinRequest.userId }
+            });
+        } else {
+            return res.status(404).json({ message: messages[lang].CONVERSATION_NOT_FOUND });
+        }
 
         await GroupJoinRequest.findByIdAndDelete(requestId);
 

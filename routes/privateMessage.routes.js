@@ -6,7 +6,7 @@ const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const validationMessages = require('../utils/messages');
 const checkPrivateMessageSender = require('../middlewares/checkPrivateMessageSender');
-const checkIfConversationMember = require('../middlewares/checkIfConversationMember');
+const messages = require('../utils/messages');
 
 /**
  * @swagger
@@ -14,52 +14,6 @@ const checkIfConversationMember = require('../middlewares/checkIfConversationMem
  *   name: Private Messages
  *   description: Routes for private message operations
  */
-
-/**
- * @swagger
- * /private-messages/conversation/{conversationId}:
- *   get:
- *     summary: Retrieve all messages in a specific conversation
- *     tags: [Private Messages]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: conversationId
- *         required: true
- *         description: ID of the conversation
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: List of messages
- *       404:
- *         description: Conversation not found
- *       500:
- *         description: Server error
- */
-router.get(
-    '/conversation/:conversationId',
-    authenticateToken,
-    checkIfConversationMember, 
-    (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-      },
-      [
-        check('conversationId')
-            .isMongoId().withMessage((value, {req}) => req.validationMessages.INVALID_CONVERS_ID)
-      ],
-      (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        next();
-    },
-      privateMessageController.getMessagesByConversationId
-);
 
 /**
  * @swagger
@@ -108,12 +62,19 @@ router.get(
 
 /**
  * @swagger
- * /private-messages/send:
+ * /private-messages/send/{recipientId}:
  *   post:
  *     summary: Send a new private message
  *     tags: [Private Messages]
  *     security:
  *       - bearerAuth: []
+*     parameters:
+ *       - in: path
+ *         name: recipientId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the recipient user
  *     requestBody:
  *       required: true
  *       content:
@@ -121,12 +82,9 @@ router.get(
  *           schema:
  *             type: object
  *             properties:
- *               recipientId:
- *                 type: string
- *                 description: ID of the message recipient
  *               content:
  *                 type: string
- *                 description: The message content
+ *                 description: Message content
  *     responses:
  *       201:
  *         description: Message sent successfully
@@ -136,7 +94,7 @@ router.get(
  *         description: Server error
  */
 router.post(
-    '/send',
+    '/send/:recipientId',
     authenticateToken,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
@@ -213,52 +171,6 @@ router.put(
         next();
     },
     privateMessageController.updateMessageById
-);
-
-/**
- * @swagger
- * /private-messages/conversation/{conversationId}:
- *   put:
- *     summary: Mark the last message in a conversation as read
- *     tags: [Private Messages]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: conversationId
- *         required: true
- *         description: ID of the conversation
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Last message marked as read
- *       404:
- *         description: Conversation or message not found
- *       500:
- *         description: Server error
- */
-router.put(
-    '/conversation/:conversationId',
-    authenticateToken,
-    checkIfConversationMember,
-    (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-    },
-    [
-        check('conversationId')
-            .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_CONVERS_ID),
-    ],
-    (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        next();
-    },
-    privateMessageController.markLastMessageAsRead
 );
 
 /**

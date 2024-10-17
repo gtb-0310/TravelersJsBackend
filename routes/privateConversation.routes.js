@@ -80,6 +80,66 @@ router.get(
 
 /**
  * @swagger
+ * /private-conversations/{conversationId}/messages:
+ *   get:
+ *     summary: Retrieve all messages in a specific private conversation
+ *     tags: [Private Conversations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: conversationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the private conversation
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved messages in the private conversation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 conversation:
+ *                   type: object
+ *                   description: Details of the conversation
+ *                 messages:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     description: Messages in the conversation
+ *       404:
+ *         description: Conversation not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  '/:conversationId/messages',
+  authenticateToken,
+  checkIfConversationMember,
+  (req, res, next) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    req.validationMessages = messages[lang];
+    next();
+  },
+  [
+    check('conversationId')
+      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_CONVERS_ID),
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  },
+  privateConversationController.getPrivateConversationById
+);
+
+
+/**
+ * @swagger
  * /private-conversations/{conversationId}:
  *   delete:
  *     summary: Delete a conversation by ID

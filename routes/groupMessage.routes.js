@@ -17,79 +17,6 @@ const messages = require('../utils/messages');
  *   description: API for managing group messages
  */
 
-/**
- * @swagger
- * /group-messages/{groupId}/conversation:
- *   get:
- *     summary: Get all messages in a group conversation
- *     tags: [Group Messages]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: groupId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the group
- *     responses:
- *       200:
- *         description: Successfully retrieved conversation
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 conversation:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: The message ID
- *                       content:
- *                         type: string
- *                         description: The message content
- *                       groupId:
- *                         type: string
- *                         description: The ID of the group
- *                       senderId:
- *                         type: string
- *                         description: The ID of the sender
- *                       timestamp:
- *                         type: string
- *                         format: date-time
- *                         description: The timestamp of the message
- *       400:
- *         description: Invalid group ID
- *       404:
- *         description: No conversation found
- *       500:
- *         description: Server error
- */
-router.get(
-  '/:groupId/conversation',
-  authenticateToken,
-  checkIfUserIsGroupMember,
-  [
-    (req, res, next) => {
-        const lang = getLanguageFromHeaders(req) || 'en';
-        req.validationMessages = messages[lang];
-        next();
-      },
-    check('groupId')
-      .isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_GROUP_ID),
-  ],
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-  groupMessageController.getConversationByGroupId
-);
 
 /**
  * @swagger
@@ -173,7 +100,7 @@ router.get(
  * @swagger
  * /group-messages/{groupId}/sender/message:
  *   post:
- *     summary: Send a new message in a group
+ *     summary: Send a new message in a group conversation
  *     tags: [Group Messages]
  *     security:
  *       - bearerAuth: []

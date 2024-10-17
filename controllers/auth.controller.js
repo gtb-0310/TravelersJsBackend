@@ -3,7 +3,8 @@ const User = require('../models/user.model'),
     jwt = require('jsonwebtoken'),
     getLanguageFromHeaders = require('../utils/languageUtils'),
     messages = require('../utils/messages'),
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    nodemailer = require('nodemailer');
 
 exports.login = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
@@ -83,6 +84,114 @@ exports.verifyEmail = async (req, res) => {
 
         res.status(200).json({ message: messages[lang].EMAIL_VERIFIED_SUCCESS });
     } catch (err) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+};
+
+exports.requestPasswordReset = async (req, res) => {
+    const { email } = req.body;
+    const lang = getLanguageFromHeaders(req) || 'en';
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: messages[lang].EMAIL_NOT_FOUND });
+        }
+
+        // Générer le token de réinitialisation
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+        // Stocker le token haché et la date d'expiration dans l'utilisateur
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 heure
+
+        // Sauvegarder l'utilisateur avec les nouvelles informations
+        await user.save();
+
+        // Générer l'URL de réinitialisation avec le token en paramètre
+        const resetUrl = `http://localhost:3000/auth/reset-password/${resetToken}`;
+
+        // Log pour vérifier que l'URL contient bien le token
+        console.log("URL de réinitialisation générée :", resetUrl);
+
+        // Configurer le transporteur d'e-mails (Mailtrap dans ton cas)
+        const transporter = nodemailer.createTransport({
+            host: 'sandbox.smtp.mailtrap.io',
+            port: 2525,
+            auth: {
+                user: process.env.MAILTRAP_USER,
+                pass: process.env.MAILTRAP_PASS
+            }
+        });
+
+        // Définir le contenu de l'e-mail
+        const mailOptions = {
+            from: 'noreply@travelers.com',
+            to: user.email,
+            subject: messages[lang].RESET_PASSWORD,
+            text: `${messages[lang].RESET_PASSWORD_TEXT} ${resetUrl}`,
+            html: `<p>${messages[lang].RESET_PASSWORD_HTML}</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+        };
+
+        // Envoyer l'e-mail
+        await transporter.sendMail(mailOptions);
+
+        // Répondre avec succès
+        res.status(200).json({ message: messages[lang].RESET_PASSWORD_EMAIL_SENT });
+    } catch (err) {
+        // Gestion des erreurs
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    const { newPassword } = req.body;
+    const resetToken = req.params.resetToken;
+    const lang = getLanguageFromHeaders(req) || 'en';
+
+    try {
+        console.log("Token reçu :", resetToken);
+        
+        const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        console.log("Token après hachage :", hashedToken);
+
+        // Recherche de l'utilisateur avec le token haché et la date d'expiration
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: { $gt: Date.now() }  // Vérifie que le token n'a pas expiré
+        });
+
+        if (!user) {
+            console.log("Utilisateur non trouvé ou token expiré");
+            return res.status(400).json({ message: messages[lang].INVALID_OR_EXPIRED_TOKEN });
+        }
+
+        console.log("Utilisateur trouvé :", user.email);
+
+        // Hachage du nouveau mot de passe
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        console.log("Mot de passe haché :", hashedPassword);
+
+        // Mise à jour du mot de passe
+        user.password = hashedPassword;
+
+        // Invalide le token après utilisation
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        // Invalider les anciens refresh tokens
+        user.refreshToken = undefined;
+
+        // Sauvegarde les changements
+        await user.save();
+        console.log("Mot de passe réinitialisé avec succès pour l'utilisateur :", user.email);
+
+        res.status(200).json({ message: messages[lang].PASSWORD_RESET_WITH_SUCCESS });
+    } catch (err) {
+        console.error("Erreur lors de la réinitialisation du mot de passe :", err);
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };

@@ -49,7 +49,8 @@ exports.getPrivateMessageById = async (req, res) => {
 exports.sendMessage = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     const senderId = req.user.id;
-    const { recipientId, content } = req.body;
+    const recipientId = req.params.recipientId;
+    const { content } = req.body;
 
     try {
         let conversation = await PrivateConversation.findOne({
@@ -71,7 +72,7 @@ exports.sendMessage = async (req, res) => {
             recipientId,
             content,
             timestamp: new Date(),
-            isRead: false
+            readBy: []
         });
 
         const savedMessage = await newMessage.save();
@@ -114,29 +115,6 @@ exports.updateMessageById = async (req, res) => {
         const updatedMessage = await message.save();
 
         res.json(updatedMessage);
-    } catch (err) {
-        res.status(500).json({ message: messages[lang].SERVER_ERROR });
-    }
-};
-
-exports.markLastMessageAsRead = async (req, res) => {
-    const { conversationId } = req.params;
-    const lang = getLanguageFromHeaders(req) || 'en';
-
-    try {
-        const conversation = await PrivateConversation.findById(conversationId);
-        if (!conversation) {
-            return res.status(404).json({ message: messages[lang].PRIVATE_CONVERS_NOT_FOUND });
-        }
-
-        const lastMessage = await PrivateMessage.findOne({ conversationId }).sort({ timestamp: -1 });
-
-        if (lastMessage) {
-            lastMessage.isRead = true;
-            await lastMessage.save();
-        }
-
-        res.json({ message: messages[lang].LAST_MESSAGE_MARKED_AS_READ });
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }

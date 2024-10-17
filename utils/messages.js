@@ -150,7 +150,8 @@ const messages = {
         NOT_ALLOWED: "You don't have the permission to do that.",
         BLOCKED_USER_NOT_FOUND: "Element not found, try again later.",
         USER_ALREADY_BLOCKED: "This user is already blocked.",
-        NO_CONVERSATIONS_GROUP_FOUND: "No group conversation found."
+        NO_CONVERSATIONS_GROUP_FOUND: "No group conversation found.",
+        PASSWORDS_MUST_MATCH: "Password and confirmation password fields must match."
         
 
     },
@@ -300,7 +301,8 @@ const messages = {
         NOT_ALLOWED: "Vous n'avez pas les permissions requises pour effectuer cette action.",
         BLOCKED_USER_NOT_FOUND: "Utilisateur bloqué non trouvé. Veuillez réessayer.",
         USER_ALREADY_BLOCKED: "Cet utilisateur est déjà bloqué.",
-        NO_CONVERSATIONS_GROUP_FOUND: "Pas de conversation de groupe trouvée."
+        NO_CONVERSATIONS_GROUP_FOUND: "Pas de conversation de groupe trouvée.",
+        PASSWORDS_MUST_MATCH: "Les mots de passes doivent correspondrent."
     },
 };
 

@@ -26,11 +26,10 @@ const privateMessageSchema = new Schema({
         default: Date.now,
         required: true
     },
-    isRead: {
-        type: Boolean,
-        default: false,
-        required: true
-    }
+    readBy: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 }, {
     timestamps: true
 });
