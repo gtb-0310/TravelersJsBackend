@@ -151,7 +151,11 @@ const messages = {
         BLOCKED_USER_NOT_FOUND: "Element not found, try again later.",
         USER_ALREADY_BLOCKED: "This user is already blocked.",
         NO_CONVERSATIONS_GROUP_FOUND: "No group conversation found.",
-        PASSWORDS_MUST_MATCH: "Password and confirmation password fields must match."
+        PASSWORDS_MUST_MATCH: "Password and confirmation password fields must match.",
+        NEW_PASSWORD: "New password",
+        CONFIRM_PASSWORD: "Confirm password",
+        RESET_BUTTON: "Reset Password",
+        INVALID_TOKEN: "Invalid token."
         
 
     },
@@ -302,7 +306,11 @@ const messages = {
         BLOCKED_USER_NOT_FOUND: "Utilisateur bloqué non trouvé. Veuillez réessayer.",
         USER_ALREADY_BLOCKED: "Cet utilisateur est déjà bloqué.",
         NO_CONVERSATIONS_GROUP_FOUND: "Pas de conversation de groupe trouvée.",
-        PASSWORDS_MUST_MATCH: "Les mots de passes doivent correspondrent."
+        PASSWORDS_MUST_MATCH: "Les mots de passes doivent correspondrent.",
+        NEW_PASSWORD: "Nouveau mot de passe",
+        CONFIRM_PASSWORD: "Confirmer le nouveau mot de passe",
+        RESET_BUTTON: "Réinitialiser le mot de passe",
+        INVALID_TOKEN: "Token invalide."
     },
 };
 

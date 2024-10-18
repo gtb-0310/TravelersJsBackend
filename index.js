@@ -3,16 +3,35 @@ require('dotenv').config();
 const express = require('express'),
     //customCorsMiddleware = require('./middlewares/corsMiddleware'),
     connectToDB = require('./config/db'),
+    messages = require('./utils/messages'),
     swaggerUi = require('swagger-ui-express'),
     swaggerJsdoc = require('swagger-jsdoc'),
     limiter = require('./middlewares/rateLimitRequest'),
     xssClean = require('xss-clean'),
     helmet = require('helmet'),
-    app = express();
+    app = express(),
+    sanitizeInputs = require('./middlewares/sanitizeInputs'),
+    getLanguageFromHeaders = require('./utils/languageUtils');
+
 
 
 // Connexion à la base de données
 connectToDB();
+
+app.use((req, res, next) => {
+    for (let key in req.headers) {
+        if (/\n|\r/.test(req.headers[key])) {
+            delete req.headers[key];
+        }
+    }
+    next();
+});
+
+app.get('/translations', (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const translations = messages[lang] || messages['en'];
+    res.json(translations);
+});
 
 // Swagger setup
 const swaggerOptions = {
@@ -90,8 +109,27 @@ app.use('/users', usersRoutes);
 app.use('/trips', tripRoutes);
 app.use('/auth', authRoutes);
 app.use(limiter);
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'nonce-randomString'"],
+                objectSrc: ["'none'"],
+                upgradeInsecureRequests: [],
+            },
+        },
+        referrerPolicy: { policy: "no-referrer" },
+        frameguard: { action: "deny" },
+        xssFilter: true,
+        hidePoweredBy: true,
+        dnsPrefetchControl: { allow: false },
+        noSniff: true,
+        hsts: process.env.NODE_ENV === 'production' ? { maxAge: 31536000, includeSubDomains: true, preload: true } : false,
+    })
+);
 app.use(xssClean());
+app.use(sanitizeInputs);
 
 
 // Lancer le serveur
