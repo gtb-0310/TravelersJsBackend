@@ -6,7 +6,7 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
 
 async function canApproveAddRequest(req, res, next) {
   const lang = getLanguageFromHeaders(req) || 'en';
-  const userId = req.user.id; 
+  const userId = req.user.id;
   const requestId = req.params.requestId;
   
   try {
