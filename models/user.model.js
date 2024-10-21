@@ -65,6 +65,17 @@ const userSchema = new Schema({
     emailVerificationExpires: {
         type: Date,
         required: false
+    },
+    reportCount: {
+        type: Number,
+        default: 0
+    },
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
+    banTimeLapse: {
+        type: Date,
     }
 }, {
     timestamps: true

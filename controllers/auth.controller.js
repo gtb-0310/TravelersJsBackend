@@ -13,7 +13,7 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ email: req.body.email});
 
         if (!user) {
-            return res.status(400).json({ message: messages[lang].USER_NOT_FOUND});
+            return res.status(400).json({ message: messages[lang].AUTH_USER_NOT_FOUND});
         }
 
         if (!user.emailVerified) {

@@ -1,6 +1,8 @@
 const ReportedUser = require('../models/reportedUser.model');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
+const ReasonReporting = require('../models/reasonReporting.model');
+const User = require('../models/user.model');
 
 /***
  * ---------------------------------------
@@ -54,12 +56,20 @@ exports.getReportingById = async (req, res) => {
 exports.createReport = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
     const reportingUserId = req.user.id;
-    const { reportedUserId, reason } = req.body;
+    const reportedUserId = req.params.reportedUserId;
+    const reasonId = req.params.reasonId;
+    const { description, evidence } = req.body;
 
     try {
+        const reason = await ReasonReporting.findById(reasonId);
+        if(!reason){
+            return res.status(404).json({ message: messages[lang].INVALID_REASON_ID });
+        }
+
         const existingReport = await ReportedUser.findOne({
             reportingUserId,
-            reportedUserId
+            reportedUserId,
+            reasonId
         });
 
         if (existingReport) {
@@ -69,16 +79,69 @@ exports.createReport = async (req, res) => {
         const newReport = new ReportedUser({
             reportingUserId,
             reportedUserId,
-            reason
+            reasonId,
+            description,
+            evidence
         });
 
         const savedReport = await newReport.save();
+
+        console.log(savedReport);
         res.status(201).json({message: messages[lang].USER_REPORTED_WITH_SUCCESS });
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 
+/***
+ * ---------------------------------------
+ * PUT
+ * ---------------------------------------
+ */
+exports.banishUser = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const reportingUserId = req.user.id;
+    const reportedUserId = req.params.reportedUserId;
+
+    try{
+        const report = await ReportedUser.findOne({ reportingUserId, reportedUserId });
+
+        if(!report){
+            res.status(404).json({ message: messages[lang].REPORT_NOT_FOUND });
+        }
+
+        report.isVerified = true;
+        await report.save();
+
+        const user = await User.findById(reportedUserId);
+        if(!user){
+            return res.status(404).json({ message: messages[lang].USER_NOT_FOUND });
+        }
+
+        user.reportCount += 1;
+
+        if (user.reportCount === 1) {
+            user.isBanned = true;
+            user.banTimeLapse = new Date(Date.now() + 24 * 60 * 60 * 1000);
+            await invalidateUserSession(user);
+            res.status(200).json({ message: messages[lang].USER_BANNED_ONE_DAY_SUCCESSFULLY });
+        } else if (user.reportCount === 2) {
+            user.isBanned = true;
+            user.banTimeLapse = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+            await invalidateUserSession(user);
+            res.status(200).json({ message: messages[lang].USER_BANNED_ONE_WEEK_SUCCESSFULLY });
+        } else if (user.reportCount >= 3) {
+            user.isBanned = true;
+            user.banTimeLapse = null;
+            await deleteUser(reportedUserId);
+            res.status(200).json({ message: messages[lang].PROFIL_DELETE_WITH_SUCCESS});
+        }
+
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: messages[lang].ERROR_OCCURED_DURING_REPORTING_VALIDATION });
+    }
+};
 
 /***
  * ---------------------------------------
@@ -100,5 +163,23 @@ exports.deleteReportById = async (req, res) => {
         res.status(200).json({ message: messages[lang].REPORT_DELETED_SUCCESS });
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+};
+
+/***
+ * ---------------------------------------
+ * ASYNC FUNCTION
+ * ---------------------------------------
+ */
+async function deleteUser(reportedUserId){
+    const userController = require('../controllers/user.controller');
+    await userController.deleteUserProfil(reportedUserId);
+};
+
+async function invalidateUserSession(user) {
+    try {
+        await User.findByIdAndUpdate(user._id, { refreshToken: '' }, { new: true, runValidators: false });
+    } catch (error) {
+        console.error("Failed to invalidate user session:", error);
     }
 };

@@ -90,10 +90,12 @@ const transportRoutes = require('./routes/transport.routes');
 const tripTypesRoutes = require('./routes/tripType.routes');
 const tripRoutes = require('./routes/trip.routes');
 const usersRoutes = require('./routes/user.routes');
+const reasonReportingRoutes = require('./routes/reasonReporting.routes');
 
 // Utilisation de routes
 app.use('/private-conversations', privateConversationsRoutes);
 app.use('/group-conversations', groupConversationRoutes);
+app.use('/reasons-reporting', reasonReportingRoutes);
 app.use('/private-messages', privateMessagesRoutes);
 app.use('/reported-users', reportedUsersRoutes);
 app.use('/group-messages', groupMessageRoutes);

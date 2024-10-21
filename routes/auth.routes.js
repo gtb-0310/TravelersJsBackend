@@ -5,6 +5,7 @@ const authController = require('../controllers/auth.controller');
 const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const path = require('path');
+const checkBanStatus = require('../middlewares/checkBanStatus');
 
 /**
  * @swagger
@@ -54,6 +55,7 @@ const path = require('path');
  *         description: Erreur du serveur
  */
 router.post(
+  checkBanStatus,
   '/login',
   [
     (req, res, next) => {

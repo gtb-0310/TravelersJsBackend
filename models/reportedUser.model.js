@@ -12,9 +12,23 @@ const reportedUserSchema = new Schema({
         ref: 'User',
         required: true
     },
-    reason: {
-        type: String,
+    reasonId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ReasonReporting',
         required: true
+    },
+    description: {
+        type: String,
+        required: false,
+        maxlength: 500
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    evidence: {
+        type: String,
+        required: false
     }
 }, {
     timestamps: true

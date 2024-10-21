@@ -143,7 +143,7 @@ exports.deleteGroupMessage = async (req, res) => {
             return res.status(404).json({ message: messages[lang].MSG_NOT_FOUND });
         }
 
-        return res.status(200).json({ message: messages[lang].MSG_DELETED });
+        return res.status(200).json({ message: messages[lang].MESSAGE_DELETED_SUCCESS });
     } catch (err) {
         return res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
