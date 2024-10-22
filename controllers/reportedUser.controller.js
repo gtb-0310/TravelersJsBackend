@@ -15,7 +15,11 @@ exports.getAllReports = async (req, res) => {
     try {
         const reports = await ReportedUser.find()
             .populate('reportedUserId', 'firstName lastName email') 
-            .populate('reportingUserId', 'firstName lastName email');
+            .populate('reportingUserId', 'firstName lastName email')
+            .populate({
+                path: 'reasonId',
+                select: `reason.${lang}`,
+            });
         
         if (reports.length === 0) {
             return res.status(404).json({ message: messages[lang].NO_REPORTS_FOUND });
@@ -34,7 +38,11 @@ exports.getReportingById = async (req, res) => {
     try {
         const reporting = await ReportedUser.findById(reportingId)
             .populate('reportedUserId', 'firstName lastName email') 
-            .populate('reportingUserId', 'firstName lastName email');
+            .populate('reportingUserId', 'firstName lastName email')
+            .populate({
+                path: 'reasonId',
+                select: `reason.${lang}`,
+            });
 
         if (!reporting) {
             return res.status(404).json({ message: messages[lang].NO_REPORTS_FOUND });
@@ -45,7 +53,6 @@ exports.getReportingById = async (req, res) => {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
-
 
 
 /***
@@ -62,6 +69,7 @@ exports.createReport = async (req, res) => {
 
     try {
         const reason = await ReasonReporting.findById(reasonId);
+
         if(!reason){
             return res.status(404).json({ message: messages[lang].INVALID_REASON_ID });
         }
@@ -81,17 +89,17 @@ exports.createReport = async (req, res) => {
             reportedUserId,
             reasonId,
             description,
+            isVerified: false,
             evidence
         });
 
         const savedReport = await newReport.save();
-
-        console.log(savedReport);
         res.status(201).json({message: messages[lang].USER_REPORTED_WITH_SUCCESS });
     } catch (err) {
         res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
+
 
 /***
  * ---------------------------------------
@@ -100,21 +108,24 @@ exports.createReport = async (req, res) => {
  */
 exports.banishUser = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const reportingUserId = req.user.id;
-    const reportedUserId = req.params.reportedUserId;
+    const reportId = req.params.reportId;
 
-    try{
-        const report = await ReportedUser.findOne({ reportingUserId, reportedUserId });
+    try {
 
-        if(!report){
-            res.status(404).json({ message: messages[lang].REPORT_NOT_FOUND });
+        const report = await ReportedUser.findById(reportId);
+
+        if (!report) {
+            return res.status(404).json({ message: messages[lang].REPORT_NOT_FOUND });
         }
 
         report.isVerified = true;
         await report.save();
 
+        const reportedUserId = report.reportedUserId;
+
         const user = await User.findById(reportedUserId);
-        if(!user){
+
+        if (!user) {
             return res.status(404).json({ message: messages[lang].USER_NOT_FOUND });
         }
 
@@ -124,37 +135,41 @@ exports.banishUser = async (req, res) => {
             user.isBanned = true;
             user.banTimeLapse = new Date(Date.now() + 24 * 60 * 60 * 1000);
             await invalidateUserSession(user);
-            res.status(200).json({ message: messages[lang].USER_BANNED_ONE_DAY_SUCCESSFULLY });
+            await user.save();
+            return res.status(200).json({ message: messages[lang].USER_BANNED_ONE_DAY_SUCCESSFULLY });
         } else if (user.reportCount === 2) {
             user.isBanned = true;
             user.banTimeLapse = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
             await invalidateUserSession(user);
-            res.status(200).json({ message: messages[lang].USER_BANNED_ONE_WEEK_SUCCESSFULLY });
+            await user.save();
+            return res.status(200).json({ message: messages[lang].USER_BANNED_ONE_WEEK_SUCCESSFULLY });
         } else if (user.reportCount >= 3) {
             user.isBanned = true;
             user.banTimeLapse = null;
-            await deleteUser(reportedUserId);
-            res.status(200).json({ message: messages[lang].PROFIL_DELETE_WITH_SUCCESS});
+            await deleteUser(reportedUserId, res, lang);
+            return;
         }
 
-        await user.save();
     } catch (error) {
         res.status(500).json({ message: messages[lang].ERROR_OCCURED_DURING_REPORTING_VALIDATION });
     }
 };
+
+
+
+
 
 /***
  * ---------------------------------------
  * DELETE
  * ---------------------------------------
  */
-
 exports.deleteReportById = async (req, res) => {
     const lang = getLanguageFromHeaders(req) || 'en';
-    const { id } = req.params;
+    const reportId = req.params.reportId;
 
     try {
-        const report = await ReportedUser.findByIdAndDelete(id);
+        const report = await ReportedUser.findByIdAndDelete(reportId);
 
         if (!report) {
             return res.status(404).json({ message: messages[lang].NO_REPORT_FOUND });
@@ -171,10 +186,26 @@ exports.deleteReportById = async (req, res) => {
  * ASYNC FUNCTION
  * ---------------------------------------
  */
-async function deleteUser(reportedUserId){
-    const userController = require('../controllers/user.controller');
-    await userController.deleteUserProfil(reportedUserId);
-};
+async function deleteUser(reportedUserId, res, lang) {
+    try {
+        const userController = require('../controllers/user.controller');
+
+        const fakeReq = {
+            user: {
+                id: reportedUserId
+            },
+            headers: {
+                'accept-language': lang
+            }
+        };
+
+        await userController.deleteUserProfil(fakeReq, res);
+    } catch (error) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
+    }
+}
+
+
 
 async function invalidateUserSession(user) {
     try {

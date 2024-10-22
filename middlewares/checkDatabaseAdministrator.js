@@ -8,7 +8,7 @@ const checkDatabaseAdministrator = async (req, res, next) => {
     const userId = req.user.id;
 
     try {
-        const isAdmin = await Administrator.findOne({ userId });
+        const isAdmin = await Administrator.findOne({ userId: userId });
 
         if (isAdmin) {
             next();

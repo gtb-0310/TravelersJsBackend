@@ -89,38 +89,50 @@ router.get(
 
 /**
  * @swagger
- * /reported-users:
+ * /reported-users/{reportedUserId}/{reasonId}:
  *   post:
  *     summary: Create a new report
  *     tags: [Reported Users]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reportedUserId
+ *         required: true
+ *         description: The ID of the user being reported
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: reasonId
+ *         required: true
+ *         description: The ID of the reason for the report
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - reportedUserId
- *               - reason
  *             properties:
- *               reportedUserId:
+ *               description:
  *                 type: string
- *                 description: The ID of the user being reported
- *               reason:
+ *                 description: Additional details about the report
+ *               evidence:
  *                 type: string
- *                 description: The reason for the report
+ *                 description: URL or path to the evidence file
  *     responses:
  *       201:
  *         description: Report created successfully
  *       400:
  *         description: Validation error
+ *       404:
+ *         description: Reason or user not found
  *       500:
  *         description: Server error
  */
 router.post(
-    '/',
+    '/:reportedUserId/:reasonId',
     authenticateToken,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
@@ -129,7 +141,7 @@ router.post(
     },
     [
         check('reportedUserId').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_USER_ID),
-        check('reason').notEmpty().withMessage((value, { req }) => req.validationMessages.REASON_REQUIRED)
+        check('reasonId').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_REASON_ID)
     ],
     (req, res, next) => {
         const errors = validationResult(req);
@@ -143,7 +155,77 @@ router.post(
 
 /**
  * @swagger
- * /reported-users/delete/{id}:
+ * /reported-users/banish/{reportId}:
+ *   put:
+ *     summary: Verify a report and ban the reported user
+ *     tags: [Reported Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: reportId
+ *         required: true
+ *         description: The ID of the report to verify and take action on
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successfully banned the user based on the report
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User banned successfully."
+ *       404:
+ *         description: Report or user not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Report not found."
+ *       500:
+ *         description: Server error occurred during the process
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "An error occurred while processing the report."
+ */
+router.put(
+    '/banish/:reportId',
+    authenticateToken,
+    checkDatabaseAdministrator,
+    (req, res, next) => {
+        const lang = getLanguageFromHeaders(req) || 'en';
+        req.validationMessages = messages[lang];
+        next();
+    },
+    [
+        check('reportId').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_REPORT_ID)
+    ],
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    },
+    reportedUserController.banishUser
+);
+
+
+/**
+ * @swagger
+ * /reported-users/delete/{reportId}:
  *   delete:
  *     summary: Delete a report by ID
  *     tags: [Reported Users]
@@ -151,7 +233,7 @@ router.post(
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: reportId
  *         required: true
  *         description: The ID of the report to delete
  *         schema:
@@ -165,15 +247,16 @@ router.post(
  *         description: Server error
  */
 router.delete(
-    '/delete/:id',
+    '/delete/:reportId',
     authenticateToken,
+    checkDatabaseAdministrator,
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
         next();
     },
     [
-        check('id').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_REPORT_ID)
+        check('reportId').isMongoId().withMessage((value, { req }) => req.validationMessages.INVALID_REPORT_ID)
     ],
     (req, res, next) => {
         const errors = validationResult(req);

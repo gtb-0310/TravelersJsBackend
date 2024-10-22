@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const getLanguageFromHeaders = require('../utils/getLanguageFromHeaders');
+const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
 
 const checkBanStatus = async (req, res, next) => {

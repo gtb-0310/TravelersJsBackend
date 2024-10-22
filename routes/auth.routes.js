@@ -55,8 +55,8 @@ const checkBanStatus = require('../middlewares/checkBanStatus');
  *         description: Erreur du serveur
  */
 router.post(
-  checkBanStatus,
   '/login',
+  checkBanStatus,
   [
     (req, res, next) => {
       const lang = getLanguageFromHeaders(req) || 'en';
