@@ -164,7 +164,10 @@ const messages = {
         USER_BANNED_ONE_WEEK_SUCCESSFULLY: "User banned for one week successfully!",
         ERROR_OCCURED_DURING_REPORTING_VALIDATION: "An error occurred while validating the reporting.",
         ACCOUNT_BANNED_TEMPORARILY: "Account temporarily banned.",
-        ACCOUNT_BANNED_PERMANENTLY: "Account definitively banned."
+        ACCOUNT_BANNED_PERMANENTLY: "Account definitively banned.",
+        PROFILE_PICTURE_UPDATED: "Profile picture updated with success!",
+        INVALID_FILE_TYPE: 'Invalid file type. Only JPEG, PNG, HEIC, and HEIF less than 5MB files are allowed.',
+        FAILED_DELETE_TEMP_FILE: "Failed to delete temporary files :"
         
 
     },
@@ -330,7 +333,10 @@ const messages = {
         USER_BANNED_ONE_WEEK_SUCCESSFULLY: "Utilisateur suspendu pendant une semaine!",
         ERROR_OCCURED_DURING_REPORTING_VALIDATION: "Une erreur est survenue pendant la validation du signalement.",
         ACCOUNT_BANNED_TEMPORARILY: "Compte temporairement suspendu.",
-        ACCOUNT_BANNED_PERMANENTLY: "Compte définitivement suspendu."
+        ACCOUNT_BANNED_PERMANENTLY: "Compte définitivement suspendu.",
+        PROFILE_PICTURE_UPDATED: "Photo de profil modifié avec succès!",
+        INVALID_FILE_TYPE: 'Format de fichier invalide. Seulement les JPEG, PNG, HEIC, and HEIF de moins de 5MB sont autorisés.',
+        FAILED_DELETE_TEMP_FILE: "Erreur dans la suppression de fichiers temporaires :"
     },
 };
 

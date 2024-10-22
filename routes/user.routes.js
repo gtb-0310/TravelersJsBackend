@@ -1,13 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { check, validationResult } = require('express-validator');
 const router = express.Router();
+const { check, validationResult } = require('express-validator');
 const userController = require('../controllers/user.controller');
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
-const checkOwnerProfil = require('../middlewares/checkOwnerProfil');
 const checkOwnerToModifProfil = require('../middlewares/checkOwnerToModifProfil');
+const multer = require('multer');
+//const checkImagesFormatUpload = multer({ dest: 'uploads/' });
+const { upload, deleteTemporaryFile } = require('../middlewares/checkImagesFormatUpload');
 
 /**
  * @swagger
@@ -153,7 +155,6 @@ router.post(
  *             required:
  *               - firstName
  *               - lastName
- *               - profilePictureUrl
  *               - description
  *               - languages
  *               - interests
@@ -164,9 +165,6 @@ router.post(
  *               lastName:
  *                 type: string
  *                 description: Nom de famille de l'utilisateur
- *               profilePictureUrl:
- *                 type: string
- *                 description: URL de l'image de profil
  *               description:
  *                 type: string
  *                 description: Une description de l'utilisateur
@@ -194,8 +192,6 @@ router.post(
  *                 firstName:
  *                   type: string
  *                 lastName:
- *                   type: string
- *                 profilePictureUrl:
  *                   type: string
  *                 description:
  *                   type: string
@@ -232,9 +228,6 @@ router.put(
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_LAST_NAME)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_LAST_NAME)
             .trim(),
-        check('profilePictureUrl')
-            .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_PROFILE_PICTURE_URL)
-            .isURL().withMessage((value, { req }) => req.validationMessages.INVALID_PROFILE_PICTURE_URL),
         check('description')
             .notEmpty().withMessage((value, { req }) => req.validationMessages.REQUIRED_DESCRIPTION)
             .isString().withMessage((value, { req }) => req.validationMessages.INVALID_DESCRIPTION)
@@ -261,7 +254,6 @@ router.put(
     },
     userController.updateUser
 );
-
 
 
 /**
@@ -338,6 +330,82 @@ router.put(
         next();
     },
     userController.changePassword
+);
+
+
+/**
+ * @swagger
+ * /users/profile-picture:
+ *   put:
+ *     summary: Update the user's profile picture
+ *     tags: [Utilisateurs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profilePicture:
+ *                 type: string
+ *                 format: binary
+ *                 description: The new profile picture file to upload
+ *     responses:
+ *       200:
+ *         description: Profile picture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Profile picture updated successfully."
+ *                 profilePictureUrl:
+ *                   type: string
+ *                   example: "https://res.cloudinary.com/your-cloud-name/image/upload/v1625488900/profile-pictures/sample.jpg"
+ *       400:
+ *         description: Bad request, image not provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Image file is required."
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User not found."
+ *       500:
+ *         description: Server error occurred during the upload
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to update profile picture."
+ */
+router.put(
+    '/profile-picture',
+    authenticateToken,
+    checkOwnerToModifProfil,
+    upload.single('profilePicture'),
+    userController.updateProfilePicture,
+    deleteTemporaryFile
 );
 
 

@@ -14,7 +14,9 @@ const getLanguageFromHeaders = require('../utils/languageUtils');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-//const cloudinary = require('../config/cloudinaryConfig');
+const cloudinary = require('../config/cloudinaryConfig');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 /***
  * ---------------------------------------
@@ -26,7 +28,7 @@ exports.getUserById = async (req, res) => {
     const userId = req.params.id;
 
     try {
-        const user = await User.findById(userId).select('firstName lastName birthDate description languages interests');
+        const user = await User.findById(userId).select('firstName lastName birthDate profilePictureUrl description languages interests');
 
         if(!user){
             return res.status(404).json({ message: messages[lang].USER_ID_NOT_FOUND });
@@ -134,7 +136,6 @@ exports.updateUser = async (req, res) => {
     const {
         firstName,
         lastName,
-        profilePictureUrl,
         description,
         languages,
         interests
@@ -153,7 +154,6 @@ exports.updateUser = async (req, res) => {
 
         userToUpdate.firstName = firstName;
         userToUpdate.lastName = lastName;
-        userToUpdate.profilePictureUrl = profilePictureUrl;
         userToUpdate.description = description;
         const oldLanguages = userToUpdate.languages;
         userToUpdate.languages = languages;
@@ -178,6 +178,31 @@ exports.updateUser = async (req, res) => {
 
     } catch (err) {
         res.status(500).json({ message: err.message });
+    }
+};
+
+exports.updateProfilePicture = async (req, res) => {
+    const lang = getLanguageFromHeaders(req) || 'en';
+    const userId = req.user.id;
+
+    try{
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: messages[lang].USER_NOT_FOUND });
+        }
+
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'profile-pictures',
+            });
+            user.profilePictureUrl = result.secure_url;
+        }
+
+        const updatedUser = await user.save();
+        res.status(200).json({ message: messages[lang].PROFILE_PICTURE_UPDATED, profilePictureUrl: updatedUser.profilePictureUrl });
+    } catch (err) {
+        res.status(500).json({ message: messages[lang].SERVER_ERROR });
     }
 };
 

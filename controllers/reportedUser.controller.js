@@ -3,6 +3,7 @@ const messages = require('../utils/messages');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const ReasonReporting = require('../models/reasonReporting.model');
 const User = require('../models/user.model');
+const cloudinary = require('cloudinary').v2;
 
 /***
  * ---------------------------------------
@@ -65,7 +66,7 @@ exports.createReport = async (req, res) => {
     const reportingUserId = req.user.id;
     const reportedUserId = req.params.reportedUserId;
     const reasonId = req.params.reasonId;
-    const { description, evidence } = req.body;
+    const { description } = req.body;
 
     try {
         const reason = await ReasonReporting.findById(reasonId);
@@ -84,13 +85,21 @@ exports.createReport = async (req, res) => {
             return res.status(400).json({ message: messages[lang].REPORT_ALREADY_EXISTS });
         }
 
+        let evidenceUrl = '';
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'evidence-images',
+            });
+            evidenceUrl = result.secure_url;
+        }
+
         const newReport = new ReportedUser({
             reportingUserId,
             reportedUserId,
             reasonId,
             description,
             isVerified: false,
-            evidence
+            evidence: evidenceUrl
         });
 
         const savedReport = await newReport.save();

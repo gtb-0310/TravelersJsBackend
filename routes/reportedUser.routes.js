@@ -6,6 +6,7 @@ const checkDatabaseAdministrator = require('../middlewares/checkDatabaseAdminist
 const authenticateToken = require('../middlewares/authenticateToken');
 const getLanguageFromHeaders = require('../utils/languageUtils');
 const messages = require('../utils/messages');
+const { upload, deleteTemporaryFile } = require('../middlewares/checkImagesFormatUpload');
 
 /**
  * @swagger
@@ -91,7 +92,7 @@ router.get(
  * @swagger
  * /reported-users/{reportedUserId}/{reasonId}:
  *   post:
- *     summary: Create a new report
+ *     summary: Create a new user report
  *     tags: [Reported Users]
  *     security:
  *       - bearerAuth: []
@@ -105,35 +106,37 @@ router.get(
  *       - in: path
  *         name: reasonId
  *         required: true
- *         description: The ID of the reason for the report
+ *         description: The ID of the reason for reporting
  *         schema:
  *           type: string
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               description:
- *                 type: string
- *                 description: Additional details about the report
  *               evidence:
  *                 type: string
- *                 description: URL or path to the evidence file
+ *                 format: binary
+ *                 description: Optional evidence file to support the report
+ *               description:
+ *                 type: string
+ *                 description: Description of the report
  *     responses:
  *       201:
  *         description: Report created successfully
  *       400:
  *         description: Validation error
  *       404:
- *         description: Reason or user not found
+ *         description: Reason or report not found
  *       500:
  *         description: Server error
  */
 router.post(
     '/:reportedUserId/:reasonId',
     authenticateToken,
+    upload.single('evidence'),
     (req, res, next) => {
         const lang = getLanguageFromHeaders(req) || 'en';
         req.validationMessages = messages[lang];
@@ -150,7 +153,8 @@ router.post(
         }
         next();
     },
-    reportedUserController.createReport
+    reportedUserController.createReport,
+    deleteTemporaryFile
 );
 
 /**
